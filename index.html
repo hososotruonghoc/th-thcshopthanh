@@ -257,8 +257,8 @@ td{padding:10px 12px;border-bottom:1px solid #f1f5f9}
       <div class="feat-card" onclick="goDocs()"><div class="feat-icon">🏛️</div><div class="feat-info"><div class="feat-title">Hồ sơ số nhà trường</div><div class="feat-desc">7 danh mục • 56 mục hồ sơ • Google Drive</div></div><div class="feat-arrow">→</div></div>
       <div class="feat-card" onclick="goCBGV()"><div class="feat-icon">👩‍🏫</div><div class="feat-info"><div class="feat-title">Hồ sơ năng lực CBGV</div><div class="feat-desc" id="featGV">21 CBGVNV • Hồ sơ cá nhân</div></div><div class="feat-arrow">→</div></div>
       <div class="feat-card" onclick="goGrades()"><div class="feat-icon">📊</div><div class="feat-info"><div class="feat-title">Quản lý học sinh</div><div class="feat-desc" id="featHS">21 lớp • 720 học sinh • 2 cấp</div></div><div class="feat-arrow">→</div></div>
-      <div class="feat-card"><div class="feat-icon">🔍</div><div class="feat-info"><div class="feat-title">Tra cứu học sinh</div><div class="feat-desc">Tìm kiếm nhanh toàn hệ thống</div></div><div class="feat-arrow">→</div></div>
-      <div class="feat-card"><div class="feat-icon">📈</div><div class="feat-info"><div class="feat-title">Thống kê</div><div class="feat-desc">Biểu đồ • Dữ liệu trực quan</div></div><div class="feat-arrow">→</div></div>
+      <div class="feat-card" onclick="goSearch()"><div class="feat-icon">🔍</div><div class="feat-info"><div class="feat-title">Tra cứu học sinh</div><div class="feat-desc">Tìm kiếm nhanh toàn hệ thống</div></div><div class="feat-arrow">→</div></div>
+      <div class="feat-card" onclick="goStats()"><div class="feat-icon">📈</div><div class="feat-info"><div class="feat-title">Thống kê</div><div class="feat-desc">Biểu đồ • Dữ liệu trực quan</div></div><div class="feat-arrow">→</div></div>
     </div>
   </section>
 
@@ -282,7 +282,7 @@ td{padding:10px 12px;border-bottom:1px solid #f1f5f9}
       <div class="feat-box" onclick="goGrades()"><div class="feat-box-icon">📚</div><h4>Sổ chủ nhiệm điện tử</h4><p>Quản lý lớp, sơ đồ lớp, nhóm HS, kế hoạch chủ nhiệm, theo dõi HS.</p></div>
       <div class="feat-box"><div class="feat-box-icon">🤖</div><h4>AI nhận xét học sinh</h4><p>Trí tuệ nhân tạo hỗ trợ viết nhận xét — chuẩn văn phong sư phạm.</p></div>
       <div class="feat-box"><div class="feat-box-icon">📊</div><h4>Thống kê trực quan</h4><p>Biểu đồ, dữ liệu phân tích — hỗ trợ Ban giám hiệu ra quyết định.</p></div>
-      <div class="feat-box"><div class="feat-box-icon">🔍</div><h4>Tra cứu nhanh</h4><p>Tìm kiếm học sinh, hồ sơ chỉ trong vài giây — tiết kiệm thời gian.</p></div>
+      <div class="feat-box" onclick="goSearch()"><div class="feat-box-icon">🔍</div><h4>Tra cứu nhanh</h4><p>Tìm kiếm học sinh, hồ sơ chỉ trong vài giây — tiết kiệm thời gian.</p></div>
       <div class="feat-box"><div class="feat-box-icon">☁️</div><h4>Dữ liệu đám mây</h4><p>Google Sheet + Google Drive — an toàn, truy cập mọi lúc mọi nơi.</p></div>
     </div>
   </section>
@@ -388,6 +388,8 @@ function goDocs(){S.page="docs";S.edoc=null;setN("docs");showPage("inner");rende
 function goCBGV(){S.page="cbgv";S.selT=null;setN("cbgv");showPage("inner");render()}
 function goAdmin(){if(isAdmin){S.page="admin";S.atab="school";showPage("inner");render();return}openLogin()}
 function goGrades(){S.page="grades";showPage("inner");render()}
+function goSearch(){S.page="search";showPage("inner");render()}
+function goStats(){S.page="stats";showPage("inner");render()}
 function goGrade(id){S.page="grade";S.gradeId=id;showPage("inner");render()}
 function goClass(g,c){S.page="class";S.gradeId=g;S.cls=c;S.stab="overview";render()}
 function ini(n){var p=n.split(' ');return p.length>=2?p[p.length-2][0]+p[p.length-1][0]:n.substring(0,2)}
@@ -460,7 +462,7 @@ function fileMauHS(){downloadXLSX('File_mau_HocSinh.xlsx','DanhSachHocSinh',
 function lnk(c){var l=CONFIG.links[c];if(!l)return '';return(l.d?'<a href="'+l.d+'" target="_blank" class="drive-chip drive">📁</a>':'<span class="drive-chip drive no-link">📁</span>')+(l.s?'<a href="'+l.s+'" target="_blank" class="drive-chip sheet">📊</a>':'<span class="drive-chip sheet no-link">📊</span>')}
 function render(){
   var a=document.getElementById('app');
-  switch(S.page){case"grades":rGrades(a);break;case"grade":rGrade(a);break;case"class":rClass(a);break;case"docs":rDocs(a);break;case"cbgv":rCBGV(a);break;case"admin":rAdmin(a);break}
+  switch(S.page){case"grades":rGrades(a);break;case"grade":rGrade(a);break;case"class":rClass(a);break;case"docs":rDocs(a);break;case"cbgv":rCBGV(a);break;case"admin":rAdmin(a);break;case"search":rSearch(a);break;case"stats":rStats(a);break}
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function rGrades(a){
@@ -536,7 +538,80 @@ function saveLinks(){
 }
 function downloadHTML(){saveLinks();var h=document.documentElement.outerHTML;var b=new Blob([h],{type:'text/html'});var u=URL.createObjectURL(b);var a=document.createElement('a');a.href=u;a.download='index.html';a.click();URL.revokeObjectURL(u);toast('📥 Đã tải!')}
 
-// ══ API FUNCTIONS ══
+// ══ TRA CỨU HỌC SINH ══
+function rSearch(a){
+  a.innerHTML='<button class="back-btn" onclick="goHome()">← Trang chủ</button>'+
+    '<div class="cbgv-header"><div class="cbgv-icon">🔍</div><div><h2 style="font-size:22px;font-weight:800;margin-bottom:2px">Tra cứu học sinh</h2><div style="font-size:13px;color:#64748b">Tìm kiếm nhanh theo tên, lớp trong toàn hệ thống</div></div></div>'+
+    '<div class="cbgv-search"><span style="font-size:16px;color:#94a3b8">🔍</span><input id="searchInput" placeholder="Nhập tên học sinh hoặc lớp (VD: Nguyễn, 1A, 6B)..." style="border:none;outline:none;font-size:14px;font-family:inherit;flex:1;color:#1e3a5f" oninput="doSearchHS(this.value)"></div>'+
+    '<div id="searchResult" style="color:#94a3b8;text-align:center;padding:40px;font-size:14px">Nhập ít nhất 2 ký tự để tìm kiếm</div>';
+  setTimeout(function(){var el=document.getElementById('searchInput');if(el)el.focus()},200);
+}
+function doSearchHS(q){
+  var el=document.getElementById('searchResult');if(!el)return;
+  q=q.trim();
+  if(q.length<2){el.innerHTML='<div style="color:#94a3b8;text-align:center;padding:40px">Nhập ít nhất 2 ký tự để tìm kiếm</div>';return}
+  el.innerHTML='<div style="text-align:center;padding:20px;color:#94a3b8">⏳ Đang tìm kiếm...</div>';
+  apiGet('getStudents',function(data){
+    if(data.error||!data.length){el.innerHTML='<div style="text-align:center;padding:30px;color:#94a3b8">Không có dữ liệu học sinh</div>';return}
+    var ql=q.toLowerCase();
+    var found=data.filter(function(s){return (s.name||'').toLowerCase().indexOf(ql)>=0||(s.class||'').toLowerCase().indexOf(ql)>=0||(s.parent||'').toLowerCase().indexOf(ql)>=0});
+    if(!found.length){el.innerHTML='<div style="text-align:center;padding:30px;color:#94a3b8">Không tìm thấy kết quả cho "'+q+'"</div>';return}
+    var html='<div style="margin-bottom:12px;font-size:13px;color:#64748b">Tìm thấy <strong style="color:#2563eb">'+found.length+'</strong> học sinh</div>';
+    html+='<div class="panel" style="padding:0;overflow:hidden"><div style="overflow-x:auto"><table><thead><tr style="background:#3B5BDB"><th style="color:#fff;width:40px">STT</th><th style="color:#fff;min-width:170px">Họ và tên</th><th style="color:#fff;width:50px">GT</th><th style="color:#fff;width:55px">Lớp</th><th style="color:#fff;width:55px">Khối</th><th style="color:#fff;width:50px">Cấp</th><th style="color:#fff;min-width:140px">Phụ huynh</th><th style="color:#fff;width:100px">SĐT PH</th></tr></thead><tbody>';
+    found.slice(0,100).forEach(function(s,i){html+='<tr style="border-bottom:1px solid #e2e8f0'+(i%2?';background:#f8fafc':'')+'"><td style="text-align:center">'+(i+1)+'</td><td style="font-weight:600">'+s.name+'</td><td style="text-align:center">'+s.gender+'</td><td style="text-align:center;font-weight:700;color:#2563eb">'+s.class+'</td><td style="text-align:center">'+s.grade+'</td><td style="text-align:center">'+(s.level||'')+'</td><td>'+(s.parent||'')+'</td><td>'+(s.parentPhone||'')+'</td></tr>'});
+    html+='</tbody></table></div></div>';
+    if(found.length>100)html+='<p style="text-align:center;color:#94a3b8;font-size:12px;margin-top:8px">Hiển thị 100/'+found.length+' kết quả</p>';
+    el.innerHTML=html;
+  });
+}
+// ══ THỐNG KÊ ══
+function rStats(a){
+  a.innerHTML='<button class="back-btn" onclick="goHome()">← Trang chủ</button>'+
+    '<div class="cbgv-header"><div class="cbgv-icon">📊</div><div><h2 style="font-size:22px;font-weight:800;margin-bottom:2px">Thống kê toàn trường</h2><div style="font-size:13px;color:#64748b">'+CONFIG.school.name+' • '+CONFIG.school.year+'</div></div></div>'+
+    '<div id="statsContent" style="text-align:center;padding:30px;color:#94a3b8">⏳ Đang tải thống kê...</div>';
+  loadStatsData();
+}
+function loadStatsData(){
+  // Thử lấy danh sách HS chi tiết từ API
+  apiGet('getStudents',function(data){
+    var el=document.getElementById('statsContent');if(!el)return;
+    // Nếu API getStudents chưa hoạt động → dùng dữ liệu lớp đã có
+    if(data.error||!Array.isArray(data)||!data.length){renderStatsFallback(el);return}
+    // Có dữ liệu HS đầy đủ → thống kê chi tiết
+    var totalHS=data.length;
+    var nam=data.filter(function(s){return s.gender==='Nam'}).length,nu=totalHS-nam;
+    var lopMap={};data.forEach(function(s){var c=s.class||'?';if(!lopMap[c])lopMap[c]={total:0,nam:0,nu:0,grade:s.grade,level:s.level};lopMap[c].total++;if(s.gender==='Nam')lopMap[c].nam++;else lopMap[c].nu++});
+    var lopArr=Object.keys(lopMap).sort();
+    var thLops=lopArr.filter(function(k){return lopMap[k].level==='TH'}),csLops=lopArr.filter(function(k){return lopMap[k].level==='THCS'});
+    var thTotal=thLops.reduce(function(a,k){return a+lopMap[k].total},0),csTotal=csLops.reduce(function(a,k){return a+lopMap[k].total},0);
+    var thNam=thLops.reduce(function(a,k){return a+lopMap[k].nam},0),csNam=csLops.reduce(function(a,k){return a+lopMap[k].nam},0);
+    var html='<div class="cbgv-stats"><div class="cbgv-stat"><div class="cbgv-stat-icon" style="background:#dbeafe;color:#2563eb">🎒</div><div><div class="cbgv-stat-val" style="color:#2563eb">'+totalHS+'</div><div class="cbgv-stat-lbl">Tổng học sinh</div></div></div><div class="cbgv-stat"><div class="cbgv-stat-icon" style="background:#e0f2fe;color:#0369a1">👦</div><div><div class="cbgv-stat-val" style="color:#0369a1">'+nam+'</div><div class="cbgv-stat-lbl">Nam</div></div></div><div class="cbgv-stat"><div class="cbgv-stat-icon" style="background:#fce7f3;color:#be185d">👧</div><div><div class="cbgv-stat-val" style="color:#be185d">'+nu+'</div><div class="cbgv-stat-lbl">Nữ</div></div></div><div class="cbgv-stat"><div class="cbgv-stat-icon" style="background:#dcfce7;color:#059669">🏠</div><div><div class="cbgv-stat-val" style="color:#059669">'+lopArr.length+'</div><div class="cbgv-stat-lbl">Lớp</div></div></div></div>';
+    html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">';
+    html+='<div class="panel"><h3 style="color:#059669">📗 Cấp Tiểu học — '+thTotal+' HS</h3>';
+    thLops.forEach(function(k){var l=lopMap[k];html+='<div class="progress-item"><div class="progress-header"><span><strong>'+k+'</strong> ('+l.total+': '+l.nam+'♂ '+l.nu+'♀)</span></div><div style="display:flex;height:12px;border-radius:6px;overflow:hidden;background:#f1f5f9"><div style="width:'+Math.round(l.nam/l.total*100)+'%;background:#3B82F6"></div><div style="width:'+Math.round(l.nu/l.total*100)+'%;background:#ec4899"></div></div></div>'});
+    html+='</div><div class="panel"><h3 style="color:#2563eb">📘 Cấp THCS — '+csTotal+' HS</h3>';
+    csLops.forEach(function(k){var l=lopMap[k];html+='<div class="progress-item"><div class="progress-header"><span><strong>'+k+'</strong> ('+l.total+': '+l.nam+'♂ '+l.nu+'♀)</span></div><div style="display:flex;height:12px;border-radius:6px;overflow:hidden;background:#f1f5f9"><div style="width:'+Math.round(l.nam/l.total*100)+'%;background:#3B82F6"></div><div style="width:'+Math.round(l.nu/l.total*100)+'%;background:#ec4899"></div></div></div>'});
+    html+='</div></div>';
+    html+='<div class="panel"><h3>📊 Tổng hợp theo cấp</h3><div style="overflow-x:auto"><table><thead><tr style="background:#1e3a5f"><th style="color:#fff">Cấp</th><th style="color:#fff">Số lớp</th><th style="color:#fff">Tổng HS</th><th style="color:#fff">Nam</th><th style="color:#fff">Nữ</th><th style="color:#fff">Tỷ lệ Nam</th></tr></thead><tbody><tr style="background:#f0fdf4"><td style="font-weight:700;color:#059669">Tiểu học</td><td style="text-align:center">'+thLops.length+'</td><td style="text-align:center;font-weight:700">'+thTotal+'</td><td style="text-align:center">'+thNam+'</td><td style="text-align:center">'+(thTotal-thNam)+'</td><td style="text-align:center">'+(thTotal?Math.round(thNam/thTotal*100):0)+'%</td></tr><tr style="background:#eff6ff"><td style="font-weight:700;color:#2563eb">THCS</td><td style="text-align:center">'+csLops.length+'</td><td style="text-align:center;font-weight:700">'+csTotal+'</td><td style="text-align:center">'+csNam+'</td><td style="text-align:center">'+(csTotal-csNam)+'</td><td style="text-align:center">'+(csTotal?Math.round(csNam/csTotal*100):0)+'%</td></tr><tr style="background:#fef3c7;font-weight:700"><td>Toàn trường</td><td style="text-align:center">'+lopArr.length+'</td><td style="text-align:center;font-size:18px;color:#d97706">'+totalHS+'</td><td style="text-align:center">'+nam+'</td><td style="text-align:center">'+nu+'</td><td style="text-align:center">'+Math.round(nam/totalHS*100)+'%</td></tr></tbody></table></div></div>';
+    el.innerHTML=html;
+  });
+}
+function renderStatsFallback(el){
+  // Dùng dữ liệu lớp đã load (G, CL) khi API getStudents chưa hoạt động
+  var gTH=G.filter(function(x){return x.id<=5}),gCS=G.filter(function(x){return x.id>5});
+  var thTotal=gTH.reduce(function(a,g){return a+g.s},0),csTotal=gCS.reduce(function(a,g){return a+g.s},0),total=thTotal+csTotal;
+  var thLops=gTH.reduce(function(a,g){return a+g.c},0),csLops=gCS.reduce(function(a,g){return a+g.c},0);
+  var html='<div class="cbgv-stats"><div class="cbgv-stat"><div class="cbgv-stat-icon" style="background:#dbeafe;color:#2563eb">🎒</div><div><div class="cbgv-stat-val" style="color:#2563eb">'+total+'</div><div class="cbgv-stat-lbl">Tổng học sinh</div></div></div><div class="cbgv-stat"><div class="cbgv-stat-icon" style="background:#dcfce7;color:#059669">📗</div><div><div class="cbgv-stat-val" style="color:#059669">'+thTotal+'</div><div class="cbgv-stat-lbl">TH</div></div></div><div class="cbgv-stat"><div class="cbgv-stat-icon" style="background:#dbeafe;color:#2563eb">📘</div><div><div class="cbgv-stat-val" style="color:#2563eb">'+csTotal+'</div><div class="cbgv-stat-lbl">THCS</div></div></div><div class="cbgv-stat"><div class="cbgv-stat-icon" style="background:#fef3c7;color:#d97706">🏠</div><div><div class="cbgv-stat-val" style="color:#d97706">'+(thLops+csLops)+'</div><div class="cbgv-stat-lbl">Lớp</div></div></div></div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px"><div class="panel"><h3 style="color:#059669">📗 Cấp Tiểu học</h3>';
+  gTH.forEach(function(g){(CL[g.id]||[]).forEach(function(c){var pct=total?Math.round(c.s/total*100):0;html+='<div class="progress-item"><div class="progress-header"><span><strong>'+c.n+'</strong> — '+c.s+' HS</span><span style="color:#059669;font-weight:700">'+c.t+'</span></div><div class="progress-track"><div class="progress-fill" style="width:'+Math.max(pct*3,8)+'%;background:linear-gradient(90deg,#059669,#10b981)"></div></div></div>'})});
+  html+='</div><div class="panel"><h3 style="color:#2563eb">📘 Cấp THCS</h3>';
+  gCS.forEach(function(g){(CL[g.id]||[]).forEach(function(c){var pct=total?Math.round(c.s/total*100):0;html+='<div class="progress-item"><div class="progress-header"><span><strong>'+c.n+'</strong> — '+c.s+' HS</span><span style="color:#2563eb;font-weight:700">'+c.t+'</span></div><div class="progress-track"><div class="progress-fill" style="width:'+Math.max(pct*3,8)+'%;background:linear-gradient(90deg,#2563eb,#3b82f6)"></div></div></div>'})});
+  html+='</div></div>';
+  html+='<div class="panel"><h3>📊 Tổng hợp</h3><div style="overflow-x:auto"><table><thead><tr style="background:#1e3a5f"><th style="color:#fff">Cấp</th><th style="color:#fff">Số lớp</th><th style="color:#fff">Tổng HS</th></tr></thead><tbody><tr style="background:#f0fdf4"><td style="font-weight:700;color:#059669">Tiểu học</td><td style="text-align:center">'+thLops+'</td><td style="text-align:center;font-weight:700">'+thTotal+'</td></tr><tr style="background:#eff6ff"><td style="font-weight:700;color:#2563eb">THCS</td><td style="text-align:center">'+csLops+'</td><td style="text-align:center;font-weight:700">'+csTotal+'</td></tr><tr style="background:#fef3c7;font-weight:700"><td>Toàn trường</td><td style="text-align:center">'+(thLops+csLops)+'</td><td style="text-align:center;font-size:18px;color:#d97706">'+total+'</td></tr></tbody></table></div></div>';
+  html+='<div style="text-align:center;margin-top:12px;padding:12px;background:#fef3c7;border-radius:10px;font-size:13px;color:#92400e">⚠️ Đang hiển thị thống kê cơ bản. Để xem chi tiết Nam/Nữ, cần cập nhật Apps Script → <strong>Triển khai phiên bản mới</strong></div>';
+  el.innerHTML=html;
+}
+// ══ API & LOAD ══
 function apiGet(action,cb){
   fetch(API_URL+'?action='+action+'&t='+Date.now(),{redirect:'follow'})
     .then(function(r){return r.json()})
