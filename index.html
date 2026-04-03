@@ -931,15 +931,35 @@ function removeDCItem(ci,si,ii){
 }
 function saveDanhMuc(){
   syncDCFromInputs();
-  toast('⏳ Đang cập nhật links lên Google Sheets...','warning');
-  apiPost({action:'saveLinks',password:CONFIG.adminPass,links:CONFIG.links},function(r1){
-    if(!r1||!r1.success){toast('⚠️ Lỗi lưu links: '+(r1&&r1.error?r1.error:'Kiểm tra Apps Script.'),'warning');return}
-    toast('⏳ Đang cập nhật danh mục lên Google Sheets...','warning');
-    apiPost({action:'saveDanhMuc',password:CONFIG.adminPass,categories:DC},function(r2){
-      if(r2&&r2.success){toast('✅ Đã cập nhật danh mục và links lên Google Sheets!');refreshCache()}
-      else toast('⚠️ '+(r2&&r2.error?r2.error:'Lỗi khi lưu danh mục. Kiểm tra Apps Script.'),'warning');
+  // Chia links thành batch nhỏ (~8 links/batch) để vừa URL GET
+  var allKeys=Object.keys(CONFIG.links),batchSize=8;
+  var batches=[];
+  for(var i=0;i<allKeys.length;i+=batchSize){
+    var chunk={};
+    allKeys.slice(i,i+batchSize).forEach(function(k){chunk[k]=CONFIG.links[k]});
+    batches.push(chunk);
+  }
+  var done=0,fail=false;
+  toast('⏳ Đang cập nhật links (0/'+batches.length+' batch)...','warning');
+  function sendBatch(idx){
+    if(fail)return;
+    if(idx>=batches.length){
+      // Tất cả links đã lưu → lưu danh mục (không kèm links)
+      toast('⏳ Đang cập nhật danh mục lên Google Sheets...','warning');
+      apiPost({action:'saveDanhMuc',password:CONFIG.adminPass,categories:DC},function(r2){
+        if(r2&&r2.success){toast('✅ Đã cập nhật danh mục và links lên Google Sheets!');refreshCache()}
+        else toast('⚠️ '+(r2&&r2.error?r2.error:'Lỗi khi lưu danh mục.'),'warning');
+      });
+      return;
+    }
+    apiPost({action:'saveLinks',password:CONFIG.adminPass,links:batches[idx]},function(r){
+      if(!r||!r.success){fail=true;toast('⚠️ Lỗi lưu links batch '+(idx+1)+': '+(r&&r.error?r.error:'Kiểm tra Apps Script.'),'warning');return}
+      done++;
+      toast('⏳ Đang cập nhật links ('+done+'/'+batches.length+' batch)...','warning');
+      sendBatch(idx+1);
     });
-  });
+  }
+  sendBatch(0);
 }
 function lnk(c){var l=CONFIG.links[c];if(!l)return '';return(l.d?'<a href="'+l.d+'" target="_blank" class="drive-chip drive">📁</a>':'<span class="drive-chip drive no-link">📁</span>')+(l.s?'<a href="'+l.s+'" target="_blank" class="drive-chip sheet">📊</a>':'<span class="drive-chip sheet no-link">📊</span>')}
 function render(noScroll){
@@ -1105,11 +1125,24 @@ function saveSchool(){
 function saveLinks(){
   var ai=[];DC.forEach(function(c){c.su.forEach(function(s){s.it.forEach(function(i){ai.push(i)})})});
   ai.forEach(function(i){var k=i.c.replace(/\./g,'_'),d=document.getElementById('ld_'+k),s=document.getElementById('ls_'+k);if(!CONFIG.links[i.c])CONFIG.links[i.c]={d:'',s:''};if(d)CONFIG.links[i.c].d=d.value.trim();if(s)CONFIG.links[i.c].s=s.value.trim()});
-  toast('⏳ Đang lưu lên Google Sheets...','warning');
-  apiPost({action:'saveLinks',password:CONFIG.adminPass,links:CONFIG.links},function(r){
-    if(r.success){toast('✅ Đã lưu link lên Sheets!');refreshCache()}
-    else toast('❌ Lỗi: '+(r.error||''),'warning');
-  });
+  // Chia links thành batch nhỏ để vừa URL GET
+  var allKeys=Object.keys(CONFIG.links),batchSize=8,batches=[];
+  for(var bi=0;bi<allKeys.length;bi+=batchSize){
+    var chunk={};allKeys.slice(bi,bi+batchSize).forEach(function(k){chunk[k]=CONFIG.links[k]});
+    batches.push(chunk);
+  }
+  var done=0,fail=false;
+  toast('⏳ Đang lưu links (0/'+batches.length+')...','warning');
+  function nextBatch(idx){
+    if(fail)return;
+    if(idx>=batches.length){toast('✅ Đã lưu tất cả links lên Sheets!');refreshCache();return}
+    apiPost({action:'saveLinks',password:CONFIG.adminPass,links:batches[idx]},function(r){
+      if(!r||!r.success){fail=true;toast('❌ Lỗi batch '+(idx+1)+': '+(r&&r.error?r.error:''),'warning');return}
+      done++;toast('⏳ Đang lưu links ('+done+'/'+batches.length+')...','warning');
+      nextBatch(idx+1);
+    });
+  }
+  nextBatch(0);
 }
 function downloadHTML(){saveLinks();var h=document.documentElement.outerHTML;var b=new Blob([h],{type:'text/html'});var u=URL.createObjectURL(b);var a=document.createElement('a');a.href=u;a.download='index.html';a.click();URL.revokeObjectURL(u);toast('📥 Đã tải!')}
 
@@ -1213,12 +1246,20 @@ function apiGet(action,cb){
     .catch(function(e){console.error('API GET:',e);cb({error:e.message})});
 }
 function apiPost(data,cb){
-  // Google Apps Script chặn POST cross-origin → dùng GET + data param
-  var encoded=encodeURIComponent(JSON.stringify(data));
-  fetch(API_URL+'?action=post&data='+encoded+'&t='+Date.now(),{redirect:'follow'})
-    .then(function(r){return r.json()})
-    .then(cb)
-    .catch(function(e){console.error('API POST:',e);cb({error:e.message})});
+  var json=JSON.stringify(data);
+  var encoded=encodeURIComponent(json);
+  // Nếu payload nhỏ → dùng GET (đã chứng minh hoạt động)
+  if(encoded.length<6000){
+    fetch(API_URL+'?action=post&data='+encoded+'&t='+Date.now(),{redirect:'follow'})
+      .then(function(r){return r.json()}).then(cb)
+      .catch(function(e){console.error('API POST:',e);cb({error:e.message})});
+  } else {
+    // Payload lớn → dùng POST thật (cần Apps Script đã deploy mới)
+    fetch(API_URL,{method:'POST',body:json,headers:{'Content-Type':'text/plain;charset=utf-8'}})
+      .then(function(r){return r.text()})
+      .then(function(t){try{cb(JSON.parse(t))}catch(e){cb({error:'Phản hồi không hợp lệ. Hãy triển khai lại Apps Script.'})}})
+      .catch(function(e){console.error('API POST large:',e);cb({error:e.message})});
+  }
 }
 function updateHero(){
   var h=document.getElementById('heroName');if(h)h.innerHTML=CONFIG.school.name.replace('TRƯỜNG ','').replace('TH VÀ THCS','TH & THCS').replace(/\s+/g,' ');
