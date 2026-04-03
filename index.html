@@ -552,7 +552,10 @@ function doSearchHS(q){
   if(q.length<2){el.innerHTML='<div style="color:#94a3b8;text-align:center;padding:40px">Nhập ít nhất 2 ký tự để tìm kiếm</div>';return}
   el.innerHTML='<div style="text-align:center;padding:20px;color:#94a3b8">⏳ Đang tìm kiếm...</div>';
   apiGet('getStudents',function(data){
-    if(data.error||!data.length){el.innerHTML='<div style="text-align:center;padding:30px;color:#94a3b8">Không có dữ liệu học sinh</div>';return}
+    if(data.error||!Array.isArray(data)||!data.length){
+      // Fallback: tìm trong dữ liệu lớp đã có
+      searchFallback(q,el);return;
+    }
     var ql=q.toLowerCase();
     var found=data.filter(function(s){return (s.name||'').toLowerCase().indexOf(ql)>=0||(s.class||'').toLowerCase().indexOf(ql)>=0||(s.parent||'').toLowerCase().indexOf(ql)>=0});
     if(!found.length){el.innerHTML='<div style="text-align:center;padding:30px;color:#94a3b8">Không tìm thấy kết quả cho "'+q+'"</div>';return}
@@ -563,6 +566,22 @@ function doSearchHS(q){
     if(found.length>100)html+='<p style="text-align:center;color:#94a3b8;font-size:12px;margin-top:8px">Hiển thị 100/'+found.length+' kết quả</p>';
     el.innerHTML=html;
   });
+}
+function searchFallback(q,el){
+  var ql=q.toLowerCase(),found=[];
+  Object.keys(CL).forEach(function(gid){(CL[gid]||[]).forEach(function(c){
+    var level=parseInt(gid)<=5?'TH':'THCS';
+    if(c.n.toLowerCase().indexOf(ql)>=0||c.t.toLowerCase().indexOf(ql)>=0||(level+' '+c.n).toLowerCase().indexOf(ql)>=0){
+      found.push({name:'Lớp '+c.n,teacher:c.t,count:c.s,level:level,grade:gid,code:c.n});
+    }
+  })});
+  if(!found.length){el.innerHTML='<div style="text-align:center;padding:30px;color:#94a3b8">Không tìm thấy kết quả cho "'+q+'"<br><span style="font-size:12px">Để tra cứu từng học sinh, cần cập nhật Apps Script</span></div>';return}
+  var html='<div style="margin-bottom:12px;font-size:13px;color:#64748b">Tìm thấy <strong style="color:#2563eb">'+found.length+'</strong> lớp</div>';
+  html+='<div class="cbgv-grid">';
+  found.forEach(function(f){html+='<div class="gv-card" onclick="goGrade('+f.grade+')"><div class="gv-card-line" style="background:linear-gradient(90deg,'+(f.level==='TH'?'#059669,#10b981':'#2563eb,#3b82f6')+')"></div><div class="gv-avatar" style="background:linear-gradient(135deg,'+(f.level==='TH'?'#059669,#10b981':'#2563eb,#3b82f6')+')">'+f.code+'</div><div class="gv-info"><div class="gv-name">Lớp '+f.code+' — '+f.count+' HS</div><div class="gv-pos" style="background:'+(f.level==='TH'?'#dcfce7;color:#059669':'#dbeafe;color:#2563eb')+'">'+f.teacher+'</div></div></div>'});
+  html+='</div>';
+  html+='<div style="text-align:center;margin-top:12px;padding:12px;background:#fef3c7;border-radius:10px;font-size:13px;color:#92400e">⚠️ Đang tìm theo lớp. Để tra cứu từng HS, cần cập nhật Apps Script → <strong>Triển khai phiên bản mới</strong></div>';
+  el.innerHTML=html;
 }
 // ══ THỐNG KÊ ══
 function rStats(a){
