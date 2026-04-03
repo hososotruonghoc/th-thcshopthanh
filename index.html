@@ -188,6 +188,13 @@ td{padding:10px 12px;border-bottom:1px solid #f1f5f9}
 @media(max-width:900px){.cbgv-grid{grid-template-columns:repeat(2,1fr)}.cbgv-stats{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:480px){.cbgv-grid{grid-template-columns:1fr}.cbgv-stats{grid-template-columns:1fr 1fr}}
 
+/* Admin student panel */
+.btn-action.selected{background:var(--blue)!important;color:#fff!important;border-color:var(--blue)!important;box-shadow:0 2px 8px rgba(59,91,219,.3)}
+.admin-hs-panel{background:#fff;border-radius:14px;padding:20px 24px;margin-top:20px;border:1px solid #e8ecf1;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.admin-hs-panel h3{margin:0 0 14px;font-size:16px}
+.edit-row td{padding:4px 6px}
+.edit-row input,.edit-row select{width:100%;padding:5px 8px;border-radius:6px;border:1px solid var(--blue);font-size:12px;font-family:inherit;outline:none}
+
 /* Modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(4px)}
 .modal-overlay.show{opacity:1;pointer-events:all}
@@ -330,7 +337,7 @@ td{padding:10px 12px;border-bottom:1px solid #f1f5f9}
       <div><label style="font-size:12px;font-weight:600;color:#475569">Ngày sinh</label><input class="form-input" id="gv_dob" placeholder="dd/mm/yyyy"></div>
       <div><label style="font-size:12px;font-weight:600;color:#475569">Số điện thoại</label><input class="form-input" id="gv_phone" placeholder="0912 345 ..."></div>
       <div><label style="font-size:12px;font-weight:600;color:#475569">Email</label><input class="form-input" id="gv_email" placeholder="email@edu.vn"></div>
-      <div><label style="font-size:12px;font-weight:600;color:#475569">Chức vụ</label><select class="form-input" id="gv_pos"><option>Giáo viên</option><option>Tổ trưởng</option><option>Tổ phó</option><option>Phó HT</option><option>Hiệu trưởng</option></select></div>
+      <div><label style="font-size:12px;font-weight:600;color:#475569">Chức vụ</label><select class="form-input" id="gv_pos"><option>Giáo viên</option><option>Tổ trưởng</option><option>Tổ phó</option><option>Phó Hiệu trưởng</option><option>Hiệu trưởng</option><option>Nhân viên</option></select></div>
       <div><label style="font-size:12px;font-weight:600;color:#475569">Bộ môn / Lớp CN</label><input class="form-input" id="gv_subj" placeholder="CN lớp 1A / Toán"></div>
       <div><label style="font-size:12px;font-weight:600;color:#475569">Cấp</label><select class="form-input" id="gv_lv"><option>TH</option><option>THCS</option></select></div>
       <div><label style="font-size:12px;font-weight:600;color:#475569">Trình độ</label><select class="form-input" id="gv_qual"><option>ĐHSP</option><option>ThS</option><option>TS</option><option>CĐSP</option></select></div>
@@ -361,6 +368,33 @@ td{padding:10px 12px;border-bottom:1px solid #f1f5f9}
   </div>
 </div>
 
+<!-- FORM THÊM HỌC SINH -->
+<div class="modal-overlay" id="formHS">
+  <div class="modal" style="width:520px;text-align:left">
+    <h2 style="font-size:18px;font-weight:700;margin-bottom:4px;text-align:center">➕ Thêm Học sinh</h2>
+    <p style="font-size:12px;color:#94a3b8;margin-bottom:16px;text-align:center" id="formHS_title">Lớp: —</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="grid-column:span 2"><label style="font-size:12px;font-weight:600;color:#475569">Họ và tên *</label><input class="form-input" id="hs_name" placeholder="Nguyễn Văn A"></div>
+      <div><label style="font-size:12px;font-weight:600;color:#475569">Giới tính</label><select class="form-input" id="hs_gender"><option>Nam</option><option>Nữ</option></select></div>
+      <div><label style="font-size:12px;font-weight:600;color:#475569">Ngày sinh</label><input class="form-input" id="hs_dob" placeholder="dd/mm/yyyy"></div>
+      <div style="grid-column:span 2"><label style="font-size:12px;font-weight:600;color:#475569">Họ tên phụ huynh</label><input class="form-input" id="hs_parent" placeholder="Nguyễn Văn B"></div>
+      <div><label style="font-size:12px;font-weight:600;color:#475569">SĐT phụ huynh</label><input class="form-input" id="hs_parentPhone" placeholder="0912 345 ..."></div>
+      <div><label style="font-size:12px;font-weight:600;color:#475569">Địa chỉ</label><input class="form-input" id="hs_address" placeholder="Xã Yên Thành"></div>
+      <div style="grid-column:span 2"><label style="font-size:12px;font-weight:600;color:#475569">Ghi chú</label><input class="form-input" id="hs_note" placeholder=""></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <button onclick="document.getElementById('formHS').classList.remove('show')" style="flex:1;padding:10px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;font-size:14px;cursor:pointer;font-family:inherit;color:#64748b">Hủy</button>
+      <button onclick="submitHS()" style="flex:1;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#059669,#10b981);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">💾 Lưu học sinh</button>
+    </div>
+  </div>
+</div>
+
+<!-- FILE INPUTS (hidden) -->
+<input type="file" id="fileImportGV" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleImportGV(event)">
+<input type="file" id="fileImportLop" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleImportLop(event)">
+<input type="file" id="fileImportHS" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleImportHS(event)">
+<input type="file" id="fileImportHSClass" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleImportHSClass(event)">
+
 <!-- FOOTER -->
 <footer class="footer"><strong>HT Digital School</strong> — <a href="#">Trường TH & THCS Hợp Thành</a> · Năm học 2025 - 2026<br>© 2026 — Thiết kế: Chung Trần — Zalo 0913 031 073</footer>
 <div class="toast" id="toast"></div>
@@ -369,13 +403,24 @@ td{padding:10px 12px;border-bottom:1px solid #f1f5f9}
 var API_URL='https://script.google.com/macros/s/AKfycbz0cv9wHVWc_wqS0BEvuyHD5RAS17uZlF1w7BH1EQr0pnQgKiTRYjPQKWZ33QZHt2N2/exec';
 var SHEET_URL='https://docs.google.com/spreadsheets/d/1M7ij-V6ref-feqvmjbTpI9Mau7rBGQpZEjGmqEplxJI/edit';
 var CONFIG={adminPass:"hopthanh2025",school:{name:"TRƯỜNG TH VÀ THCS HỢP THÀNH",address:"Xã Yên Thành, Tỉnh Nghệ An",principal:"",phone:"",email:"",year:"2025 – 2026"},
-links:{"1.1.1":{d:"https://drive.google.com/drive/folders/14OB1YqPwspA2K0VHKNZW3bNe2WdHPjb6",s:""},"1.1.2":{d:"https://drive.google.com/drive/folders/1ggyKdzLDGCcYv3hPUN1cVmfPbpcWXaQT",s:""},"1.1.3":{d:"https://drive.google.com/drive/folders/11QXg-tJiHDYGwD6hSPc61wT27cLqsrbB",s:""},"1.1.4":{d:"https://drive.google.com/drive/folders/1bV2UT8-cUCEgNzPk4IAwVwabhfp3oU_9",s:""},"1.2.1":{d:"https://drive.google.com/drive/folders/1-GJUkQZENkGiaBUJO1NE83QiW5RWTtpU",s:""},"1.2.2":{d:"https://drive.google.com/drive/folders/1tjHNC5jwXBxdhcdkhFohTXz89ki-pl9J",s:""},"1.2.3":{d:"https://drive.google.com/drive/folders/1uGwz8lmulRuiOuNoakbNat8u6LzqNUtV",s:""},"1.2.4":{d:"https://drive.google.com/drive/folders/1KWgF96Afmn1GDdPMRD1UqXUGEXYyMv91",s:""},"1.3.1":{d:"https://drive.google.com/drive/folders/15jKJzCErWknwO2vmAbQNC6HQfTb9y3Gx",s:""},"1.3.2":{d:"https://drive.google.com/drive/folders/1oFEm42DYz_X0--Il9uKjlDFKOiM59KKq",s:""},"1.3.3":{d:"https://drive.google.com/drive/folders/1VsGb0lajs6MOgZNzdGsZp1V6IbJo02-y",s:""},"1.3.4":{d:"https://drive.google.com/drive/folders/1HzW08Fn3VMplcZq1any2cNg9vWwnyH69",s:""},"1.3.5":{d:"https://drive.google.com/drive/folders/1fBh_A8X_AIydEgX4wLOww8-bTtPDOL8J",s:""},"1.4.1":{d:"https://drive.google.com/drive/folders/1rYXlhJ9pw13E4kE7tRgmcHIf6xI4DrMQ",s:""},"2.1.1":{d:"https://drive.google.com/drive/folders/1INeTOZdCI0K5GQ_NcUkvy7d34r4wmJfD",s:""},"2.1.2":{d:"https://drive.google.com/drive/folders/1oWrmHiZtBVRJuBV2Lamg_UB4_HV5yoPI",s:""},"2.2.1":{d:"https://drive.google.com/drive/folders/1MIPRdtA-EQ6Ll-jxP5PRX2YtUP4oC_iw",s:""},"2.2.2":{d:"https://drive.google.com/drive/folders/1l0gIxbNSREcSzGAGHug_SVNHIuxl0pbp",s:""},"2.2.3":{d:"https://drive.google.com/drive/folders/1MddW2Va_xg7ITOA_T8XXO_0y8bO7KKDE",s:""},"2.3.1":{d:"https://drive.google.com/drive/folders/1JKaZypmRDoXXrLt9KRTxXVl7MfEoTk3t",s:""},"2.3.2":{d:"https://drive.google.com/drive/folders/1nc03BwLhnBAUW5G59m5t-KFgDeNehHpr",s:""},"2.3.3":{d:"https://drive.google.com/drive/folders/1P8oML0bS-ArnoHjhkQCrf3fr4fBBfPPE",s:""},"2.3.4":{d:"https://drive.google.com/drive/folders/18ToKJRSgVPdJhLUVpnitDLrjpNr2o4A3",s:""},"2.4.1":{d:"https://drive.google.com/drive/folders/1Bf8HfcMn_qU9iAnDSR8xnxLXRkPjRurY",s:""},"2.4.2":{d:"https://drive.google.com/drive/folders/17Pvl7xJmJfrW6WgOAhww0Gorr4oG9c8r",s:""},"3.1.1":{d:"https://drive.google.com/drive/folders/1kGSRLR36XLPJRWZ03gg9f0BHRcsPg6Xy",s:""},"3.1.2":{d:"https://drive.google.com/drive/folders/12aqfYVVn0HvqTFJOM9Ck2xDqQZV_It_u",s:""},"3.1.3":{d:"https://drive.google.com/drive/folders/1JOv3gTcUNHOt3Il06C5WtL1zzswggR-j",s:""},"3.2.1":{d:"https://drive.google.com/drive/folders/1_iGJtlJpjRwmKCV9GRK9pyS8N7vqrfsf",s:""},"3.2.2":{d:"https://drive.google.com/drive/folders/1rXswS-g980Tgrn8eJiMBLcgAU4RRHvTV",s:""},"3.2.3":{d:"https://drive.google.com/drive/folders/1MzzACnvRA5IGxgeSEuLmmACq5dkgv18W",s:""},"3.3.1":{d:"https://drive.google.com/drive/folders/17vpp47JP4S5AMiQFJmB4WIvx3yOq--Iv",s:""},"3.3.2":{d:"https://drive.google.com/drive/folders/1x8_NrfhVLUuIb_lUBDBGxpqVvRgrFwhj",s:""},"3.3.3":{d:"https://drive.google.com/drive/folders/1xHowcxyOW-SjaD35TFsGz1flr6B8Y8wZ",s:""},"4.1.1":{d:"https://drive.google.com/drive/folders/1RwGCCH19sEt-WKAY3vfumOhARpBxKI0-",s:""},"4.1.2":{d:"https://drive.google.com/drive/folders/1qkCzDOr7UbHapTTgc3hGM3lcVzifJhMn",s:""},"4.2.1":{d:"https://drive.google.com/drive/folders/1tnRcqPcSeoAGiEcaEO44ZMyce37aKr06",s:""},"4.2.2":{d:"https://drive.google.com/drive/folders/1U4cWCXM8tzEGg_KbbMrwdxyMLl2WQXXo",s:""},"4.2.3":{d:"https://drive.google.com/drive/folders/1F_kpJ0Wydyn1w3PYTq9BdsnL58lKQQN5",s:""},"4.3.1":{d:"https://drive.google.com/drive/folders/1ISdBkpnp0GiorTQlyRz1B65R7mVqgeuz",s:""},"4.3.2":{d:"https://drive.google.com/drive/folders/1p_eTvSP-BalLpH06mppZ-2WbHNHnXO6l",s:""},"4.3.3":{d:"https://drive.google.com/drive/folders/1Ie5yGck-wE3vkpvex-SieOK9CNp5L-kz",s:""},"5.1.1":{d:"https://drive.google.com/drive/folders/1fMJt3IKda2SvRsIEoxLeHkkxUjtX4V8-",s:""},"5.1.2":{d:"https://drive.google.com/drive/folders/14hWKPjHBLtoMnj4z3pa0w3kvDfNXtGna",s:""},"5.2.1":{d:"https://drive.google.com/drive/folders/1ksqtpPdGhcANJMgE1kKi12QY1QryAEKV",s:""},"5.2.2":{d:"https://drive.google.com/drive/folders/1E_HiEJd6zwDv-yU_Gm-Crdb0WCYw-GAW",s:""},"5.3.1":{d:"https://drive.google.com/drive/folders/1YU5HCAkqQ-LM8JRQSMmy3iFcDKyqpPbS",s:""},"5.3.2":{d:"https://drive.google.com/drive/folders/1fIkB2AbS1KqzutkclouHDuCyKaXXGcDX",s:""},"5.4.1":{d:"https://drive.google.com/drive/folders/1Oayb_sE2vjYKmolZAg3Z2y4nBCPRcHcd",s:""},"5.4.2":{d:"https://drive.google.com/drive/folders/1TAE1DaqnY7a13mYXSQ2_V8fSht23VjYV",s:""},"6.1.1":{d:"https://drive.google.com/drive/folders/1VeiM_Js8kSj8q7gQ113P1VRIgXLJN0BU",s:""},"6.1.2":{d:"https://drive.google.com/drive/folders/1GiwowdiRb68bLjsVX1cJs6aJBIPOOx0e",s:""},"6.1.3":{d:"https://drive.google.com/drive/folders/1glVjsAD7rgwopwYz-lVDjUFFOD4RGxf5",s:""},"6.2.1":{d:"https://drive.google.com/drive/folders/1zddPvtPGKJkkmdg9904AJ7hOSJPi_xVU",s:""},"6.2.2":{d:"https://drive.google.com/drive/folders/1vP4dX-xxpMsXdiIXLZNq9QrEvuPgbtF5",s:""},"6.2.3":{d:"https://drive.google.com/drive/folders/1v7sb2wJw9ckwkQht2MyBv2DHZjsUMmy1",s:""},"6.3.1":{d:"https://drive.google.com/drive/folders/1d-yzabXFh4aDV_rbKB3Nc6mdsF9BZCwZ",s:""},"6.3.2":{d:"https://drive.google.com/drive/folders/1nt3OxcInlJpPT5wWkDC65oo4VrZ_A6QA",s:""},"7.1.1":{d:"https://drive.google.com/drive/folders/1nrHEAohGSmBAp9EoYnNNYFBWsIiS8skH",s:""},"7.1.2":{d:"https://drive.google.com/drive/folders/177I4aOCoL6xbfGoNd1y2BfMfdszYiKve",s:""},"7.1.3":{d:"https://drive.google.com/drive/folders/16qgVsP2piOtGLoHufdsT6DQLiTxxyTtS",s:""},"7.2.1":{d:"https://drive.google.com/drive/folders/1iS8dMAAgMgC10WQHRB8awVIQQpbWjH6d",s:""},"7.2.2":{d:"https://drive.google.com/drive/folders/15actrxa3S298mhDOOioJpgpIzQWMlbEt",s:""},"7.2.3":{d:"https://drive.google.com/drive/folders/1WnujtgynzAvmP9zqApRY6dIBWhp8SfRZ",s:""},"7.2.4":{d:"https://drive.google.com/drive/folders/13_clV_pyZIZEdpAzGWXdAG3I-0GsqiOE",s:""},"7.2.5":{d:"https://drive.google.com/drive/folders/1yD0fMcSkaFN8oCQDI1EFa1LhYUXtCQ-D",s:""},"7.2.6":{d:"https://drive.google.com/drive/folders/1MkT0dyVYSDGWKMnstJFUmdjtlotSO10n",s:""}}};var T=[{id:1,name:"Nguyễn Thị Hoa",gender:"Nữ",dob:"12/03/1985",phone:"0912xxx001",email:"hoa@edu.vn",pos:"Giáo viên",subj:"CN lớp 1A",lv:"TH",qual:"ĐHSP",yr:2008,drive:''},{id:2,name:"Trần Thị Mai",gender:"Nữ",dob:"20/07/1988",phone:"0912xxx002",email:"mai@edu.vn",pos:"Giáo viên",subj:"CN lớp 1B",lv:"TH",qual:"ĐHSP",yr:2010,drive:''},{id:3,name:"Lê Thị Lan",gender:"Nữ",dob:"15/01/1990",phone:"0912xxx003",email:"lan@edu.vn",pos:"Giáo viên",subj:"CN lớp 1C",lv:"TH",qual:"ĐHSP",yr:2012,drive:''},{id:4,name:"Phạm Thị Thu",gender:"Nữ",dob:"05/11/1987",phone:"0912xxx004",email:"thu@edu.vn",pos:"Tổ trưởng",subj:"CN lớp 2A",lv:"TH",qual:"ThS",yr:2009,drive:''},{id:5,name:"Hoàng Thị Nga",gender:"Nữ",dob:"18/04/1991",phone:"0912xxx005",email:"nga@edu.vn",pos:"Giáo viên",subj:"CN lớp 2B",lv:"TH",qual:"ĐHSP",yr:2013,drive:''},{id:6,name:"Võ Thị Hằng",gender:"Nữ",dob:"22/09/1986",phone:"0912xxx006",email:"hang@edu.vn",pos:"Giáo viên",subj:"CN lớp 2C",lv:"TH",qual:"ĐHSP",yr:2008,drive:''},{id:7,name:"Đặng Thị Linh",gender:"Nữ",dob:"30/06/1989",phone:"0912xxx007",email:"linh@edu.vn",pos:"Giáo viên",subj:"CN lớp 3A",lv:"TH",qual:"ĐHSP",yr:2011,drive:''},{id:8,name:"Bùi Thị Trang",gender:"Nữ",dob:"14/02/1992",phone:"0912xxx008",email:"trang@edu.vn",pos:"Giáo viên",subj:"CN lớp 3B",lv:"TH",qual:"ĐHSP",yr:2014,drive:''},{id:9,name:"Ngô Thị Yến",gender:"Nữ",dob:"07/08/1993",phone:"0912xxx009",email:"yen@edu.vn",pos:"Giáo viên",subj:"CN lớp 3C",lv:"TH",qual:"ĐHSP",yr:2015,drive:''},{id:10,name:"Trịnh Văn Đức",gender:"Nam",dob:"01/12/1984",phone:"0912xxx010",email:"duc@edu.vn",pos:"Tổ trưởng",subj:"CN lớp 4A",lv:"TH",qual:"ThS",yr:2006,drive:''},{id:11,name:"Lý Thị Hương",gender:"Nữ",dob:"25/10/1988",phone:"0912xxx011",email:"huong@edu.vn",pos:"Giáo viên",subj:"CN lớp 4B",lv:"TH",qual:"ĐHSP",yr:2010,drive:''},{id:12,name:"Phan Thị Oanh",gender:"Nữ",dob:"19/05/1985",phone:"0912xxx012",email:"oanh@edu.vn",pos:"Giáo viên",subj:"CN lớp 5A",lv:"TH",qual:"ĐHSP",yr:2007,drive:''},{id:13,name:"Đinh Văn Nam",gender:"Nam",dob:"08/03/1987",phone:"0912xxx013",email:"nam@edu.vn",pos:"Giáo viên",subj:"CN lớp 5B",lv:"TH",qual:"ĐHSP",yr:2009,drive:''},{id:14,name:"Nguyễn Văn Hùng",gender:"Nam",dob:"14/07/1982",phone:"0912xxx014",email:"hung@edu.vn",pos:"Tổ trưởng",subj:"Toán-Tin",lv:"THCS",qual:"ThS",yr:2004,drive:''},{id:15,name:"Trần Thị Thanh",gender:"Nữ",dob:"30/11/1986",phone:"0912xxx015",email:"thanh@edu.vn",pos:"Giáo viên",subj:"Ngữ văn",lv:"THCS",qual:"ĐHSP",yr:2008,drive:''},{id:16,name:"Lê Văn Tuấn",gender:"Nam",dob:"05/09/1983",phone:"0912xxx016",email:"tuan@edu.vn",pos:"Giáo viên",subj:"KHTN",lv:"THCS",qual:"ĐHSP",yr:2005,drive:''},{id:17,name:"Phạm Thị Ngọc",gender:"Nữ",dob:"22/04/1990",phone:"0912xxx017",email:"ngoc@edu.vn",pos:"Giáo viên",subj:"Tiếng Anh",lv:"THCS",qual:"ĐHSP",yr:2012,drive:''},{id:18,name:"Hoàng Văn Minh",gender:"Nam",dob:"10/01/1981",phone:"0912xxx018",email:"minh@edu.vn",pos:"Tổ trưởng",subj:"KHXH",lv:"THCS",qual:"ThS",yr:2003,drive:''},{id:19,name:"Võ Thị Bích",gender:"Nữ",dob:"17/06/1989",phone:"0912xxx019",email:"bich@edu.vn",pos:"Giáo viên",subj:"Thể dục",lv:"THCS",qual:"ĐHSP",yr:2011,drive:''},{id:20,name:"Đặng Văn Thắng",gender:"Nam",dob:"28/08/1984",phone:"0912xxx020",email:"thang@edu.vn",pos:"Giáo viên",subj:"Công nghệ",lv:"THCS",qual:"ĐHSP",yr:2006,drive:''},{id:21,name:"Bùi Thị Phượng",gender:"Nữ",dob:"03/12/1991",phone:"0912xxx021",email:"phuong@edu.vn",pos:"Giáo viên",subj:"Âm nhạc-MT",lv:"THCS",qual:"ĐHSP",yr:2013,drive:''}];
+links:{"1.1.1":{d:"https://drive.google.com/drive/folders/14OB1YqPwspA2K0VHKNZW3bNe2WdHPjb6",s:""},"1.1.2":{d:"https://drive.google.com/drive/folders/1ggyKdzLDGCcYv3hPUN1cVmfPbpcWXaQT",s:""},"1.1.3":{d:"https://drive.google.com/drive/folders/11QXg-tJiHDYGwD6hSPc61wT27cLqsrbB",s:""},"1.1.4":{d:"https://drive.google.com/drive/folders/1bV2UT8-cUCEgNzPk4IAwVwabhfp3oU_9",s:""},"1.2.1":{d:"https://drive.google.com/drive/folders/1-GJUkQZENkGiaBUJO1NE83QiW5RWTtpU",s:""},"1.2.2":{d:"https://drive.google.com/drive/folders/1tjHNC5jwXBxdhcdkhFohTXz89ki-pl9J",s:""},"1.2.3":{d:"https://drive.google.com/drive/folders/1uGwz8lmulRuiOuNoakbNat8u6LzqNUtV",s:""},"1.2.4":{d:"https://drive.google.com/drive/folders/1KWgF96Afmn1GDdPMRD1UqXUGEXYyMv91",s:""},"1.3.1":{d:"https://drive.google.com/drive/folders/15jKJzCErWknwO2vmAbQNC6HQfTb9y3Gx",s:""},"1.3.2":{d:"https://drive.google.com/drive/folders/1oFEm42DYz_X0--Il9uKjlDFKOiM59KKq",s:""},"1.3.3":{d:"https://drive.google.com/drive/folders/1VsGb0lajs6MOgZNzdGsZp1V6IbJo02-y",s:""},"1.3.4":{d:"https://drive.google.com/drive/folders/1HzW08Fn3VMplcZq1any2cNg9vWwnyH69",s:""},"1.3.5":{d:"https://drive.google.com/drive/folders/1fBh_A8X_AIydEgX4wLOww8-bTtPDOL8J",s:""},"1.4.1":{d:"https://drive.google.com/drive/folders/1rYXlhJ9pw13E4kE7tRgmcHIf6xI4DrMQ",s:""},"2.1.1":{d:"https://drive.google.com/drive/folders/1INeTOZdCI0K5GQ_NcUkvy7d34r4wmJfD",s:""},"2.1.2":{d:"https://drive.google.com/drive/folders/1oWrmHiZtBVRJuBV2Lamg_UB4_HV5yoPI",s:""},"2.2.1":{d:"https://drive.google.com/drive/folders/1MIPRdtA-EQ6Ll-jxP5PRX2YtUP4oC_iw",s:""},"2.2.2":{d:"https://drive.google.com/drive/folders/1l0gIxbNSREcSzGAGHug_SVNHIuxl0pbp",s:""},"2.2.3":{d:"https://drive.google.com/drive/folders/1MddW2Va_xg7ITOA_T8XXO_0y8bO7KKDE",s:""},"2.3.1":{d:"https://drive.google.com/drive/folders/1JKaZypmRDoXXrLt9KRTxXVl7MfEoTk3t",s:""},"2.3.2":{d:"https://drive.google.com/drive/folders/1nc03BwLhnBAUW5G59m5t-KFgDeNehHpr",s:""},"2.3.3":{d:"https://drive.google.com/drive/folders/1P8oML0bS-ArnoHjhkQCrf3fr4fBBfPPE",s:""},"2.3.4":{d:"https://drive.google.com/drive/folders/18ToKJRSgVPdJhLUVpnitDLrjpNr2o4A3",s:""},"2.4.1":{d:"https://drive.google.com/drive/folders/1Bf8HfcMn_qU9iAnDSR8xnxLXRkPjRurY",s:""},"2.4.2":{d:"https://drive.google.com/drive/folders/17Pvl7xJmJfrW6WgOAhww0Gorr4oG9c8r",s:""},"3.1.1":{d:"https://drive.google.com/drive/folders/1kGSRLR36XLPJRWZ03gg9f0BHRcsPg6Xy",s:""},"3.1.2":{d:"https://drive.google.com/drive/folders/12aqfYVVn0HvqTFJOM9Ck2xDqQZV_It_u",s:""},"3.1.3":{d:"https://drive.google.com/drive/folders/1JOv3gTcUNHOt3Il06C5WtL1zzswggR-j",s:""},"3.2.1":{d:"https://drive.google.com/drive/folders/1_iGJtlJpjRwmKCV9GRK9pyS8N7vqrfsf",s:""},"3.2.2":{d:"https://drive.google.com/drive/folders/1rXswS-g980Tgrn8eJiMBLcgAU4RRHvTV",s:""},"3.2.3":{d:"https://drive.google.com/drive/folders/1MzzACnvRA5IGxgeSEuLmmACq5dkgv18W",s:""},"3.3.1":{d:"https://drive.google.com/drive/folders/17vpp47JP4S5AMiQFJmB4WIvx3yOq--Iv",s:""},"3.3.2":{d:"https://drive.google.com/drive/folders/1x8_NrfhVLUuIb_lUBDBGxpqVvRgrFwhj",s:""},"3.3.3":{d:"https://drive.google.com/drive/folders/1xHowcxyOW-SjaD35TFsGz1flr6B8Y8wZ",s:""},"4.1.1":{d:"https://drive.google.com/drive/folders/1RwGCCH19sEt-WKAY3vfumOhARpBxKI0-",s:""},"4.1.2":{d:"https://drive.google.com/drive/folders/1qkCzDOr7UbHapTTgc3hGM3lcVzifJhMn",s:""},"4.2.1":{d:"https://drive.google.com/drive/folders/1tnRcqPcSeoAGiEcaEO44ZMyce37aKr06",s:""},"4.2.2":{d:"https://drive.google.com/drive/folders/1U4cWCXM8tzEGg_KbbMrwdxyMLl2WQXXo",s:""},"4.2.3":{d:"https://drive.google.com/drive/folders/1F_kpJ0Wydyn1w3PYTq9BdsnL58lKQQN5",s:""},"4.3.1":{d:"https://drive.google.com/drive/folders/1ISdBkpnp0GiorTQlyRz1B65R7mVqgeuz",s:""},"4.3.2":{d:"https://drive.google.com/drive/folders/1p_eTvSP-BalLpH06mppZ-2WbHNHnXO6l",s:""},"4.3.3":{d:"https://drive.google.com/drive/folders/1Ie5yGck-wE3vkpvex-SieOK9CNp5L-kz",s:""},"5.1.1":{d:"https://drive.google.com/drive/folders/1fMJt3IKda2SvRsIEoxLeHkkxUjtX4V8-",s:""},"5.1.2":{d:"https://drive.google.com/drive/folders/14hWKPjHBLtoMnj4z3pa0w3kvDfNXtGna",s:""},"5.2.1":{d:"https://drive.google.com/drive/folders/1ksqtpPdGhcANJMgE1kKi12QY1QryAEKV",s:""},"5.2.2":{d:"https://drive.google.com/drive/folders/1E_HiEJd6zwDv-yU_Gm-Crdb0WCYw-GAW",s:""},"5.3.1":{d:"https://drive.google.com/drive/folders/1YU5HCAkqQ-LM8JRQSMmy3iFcDKyqpPbS",s:""},"5.3.2":{d:"https://drive.google.com/drive/folders/1fIkB2AbS1KqzutkclouHDuCyKaXXGcDX",s:""},"5.4.1":{d:"https://drive.google.com/drive/folders/1Oayb_sE2vjYKmolZAg3Z2y4nBCPRcHcd",s:""},"5.4.2":{d:"https://drive.google.com/drive/folders/1TAE1DaqnY7a13mYXSQ2_V8fSht23VjYV",s:""},"6.1.1":{d:"https://drive.google.com/drive/folders/1VeiM_Js8kSj8q7gQ113P1VRIgXLJN0BU",s:""},"6.1.2":{d:"https://drive.google.com/drive/folders/1GiwowdiRb68bLjsVX1cJs6aJBIPOOx0e",s:""},"6.1.3":{d:"https://drive.google.com/drive/folders/1glVjsAD7rgwopwYz-lVDjUFFOD4RGxf5",s:""},"6.2.1":{d:"https://drive.google.com/drive/folders/1zddPvtPGKJkkmdg9904AJ7hOSJPi_xVU",s:""},"6.2.2":{d:"https://drive.google.com/drive/folders/1vP4dX-xxpMsXdiIXLZNq9QrEvuPgbtF5",s:""},"6.2.3":{d:"https://drive.google.com/drive/folders/1v7sb2wJw9ckwkQht2MyBv2DHZjsUMmy1",s:""},"6.3.1":{d:"https://drive.google.com/drive/folders/1d-yzabXFh4aDV_rbKB3Nc6mdsF9BZCwZ",s:""},"6.3.2":{d:"https://drive.google.com/drive/folders/1nt3OxcInlJpPT5wWkDC65oo4VrZ_A6QA",s:""},"7.1.1":{d:"https://drive.google.com/drive/folders/1nrHEAohGSmBAp9EoYnNNYFBWsIiS8skH",s:""},"7.1.2":{d:"https://drive.google.com/drive/folders/177I4aOCoL6xbfGoNd1y2BfMfdszYiKve",s:""},"7.1.3":{d:"https://drive.google.com/drive/folders/16qgVsP2piOtGLoHufdsT6DQLiTxxyTtS",s:""},"7.2.1":{d:"https://drive.google.com/drive/folders/1iS8dMAAgMgC10WQHRB8awVIQQpbWjH6d",s:""},"7.2.2":{d:"https://drive.google.com/drive/folders/15actrxa3S298mhDOOioJpgpIzQWMlbEt",s:""},"7.2.3":{d:"https://drive.google.com/drive/folders/1WnujtgynzAvmP9zqApRY6dIBWhp8SfRZ",s:""},"7.2.4":{d:"https://drive.google.com/drive/folders/13_clV_pyZIZEdpAzGWXdAG3I-0GsqiOE",s:""},"7.2.5":{d:"https://drive.google.com/drive/folders/1yD0fMcSkaFN8oCQDI1EFa1LhYUXtCQ-D",s:""},"7.2.6":{d:"https://drive.google.com/drive/folders/1MkT0dyVYSDGWKMnstJFUmdjtlotSO10n",s:""}}};var T=[
+{id:22,name:"Nguyễn Thị Thanh",gender:"Nữ",dob:"15/08/1975",phone:"0912xxx022",email:"thanh.ht@edu.vn",pos:"Hiệu trưởng",subj:"Quản lý",lv:"TH",qual:"ThS",yr:1997,drive:''},
+{id:23,name:"Thái Việt Hồng",gender:"Nữ",dob:"20/03/1978",phone:"0912xxx023",email:"hong.pht@edu.vn",pos:"Phó Hiệu trưởng",subj:"Chuyên môn TH",lv:"TH",qual:"ThS",yr:2000,drive:''},
+{id:24,name:"Nguyễn Thị Hiền",gender:"Nữ",dob:"10/11/1980",phone:"0912xxx024",email:"hien.pht@edu.vn",pos:"Phó Hiệu trưởng",subj:"Chuyên môn THCS",lv:"THCS",qual:"ThS",yr:2002,drive:''},
+{id:1,name:"Nguyễn Thị Hoa",gender:"Nữ",dob:"12/03/1985",phone:"0912xxx001",email:"hoa@edu.vn",pos:"Giáo viên",subj:"CN lớp 1A",lv:"TH",qual:"ĐHSP",yr:2008,drive:''},{id:2,name:"Trần Thị Mai",gender:"Nữ",dob:"20/07/1988",phone:"0912xxx002",email:"mai@edu.vn",pos:"Giáo viên",subj:"CN lớp 1B",lv:"TH",qual:"ĐHSP",yr:2010,drive:''},{id:3,name:"Lê Thị Lan",gender:"Nữ",dob:"15/01/1990",phone:"0912xxx003",email:"lan@edu.vn",pos:"Giáo viên",subj:"CN lớp 1C",lv:"TH",qual:"ĐHSP",yr:2012,drive:''},{id:4,name:"Phạm Thị Thu",gender:"Nữ",dob:"05/11/1987",phone:"0912xxx004",email:"thu@edu.vn",pos:"Tổ trưởng",subj:"CN lớp 2A",lv:"TH",qual:"ThS",yr:2009,drive:''},{id:5,name:"Hoàng Thị Nga",gender:"Nữ",dob:"18/04/1991",phone:"0912xxx005",email:"nga@edu.vn",pos:"Giáo viên",subj:"CN lớp 2B",lv:"TH",qual:"ĐHSP",yr:2013,drive:''},{id:6,name:"Võ Thị Hằng",gender:"Nữ",dob:"22/09/1986",phone:"0912xxx006",email:"hang@edu.vn",pos:"Giáo viên",subj:"CN lớp 2C",lv:"TH",qual:"ĐHSP",yr:2008,drive:''},{id:7,name:"Đặng Thị Linh",gender:"Nữ",dob:"30/06/1989",phone:"0912xxx007",email:"linh@edu.vn",pos:"Giáo viên",subj:"CN lớp 3A",lv:"TH",qual:"ĐHSP",yr:2011,drive:''},{id:8,name:"Bùi Thị Trang",gender:"Nữ",dob:"14/02/1992",phone:"0912xxx008",email:"trang@edu.vn",pos:"Giáo viên",subj:"CN lớp 3B",lv:"TH",qual:"ĐHSP",yr:2014,drive:''},{id:9,name:"Ngô Thị Yến",gender:"Nữ",dob:"07/08/1993",phone:"0912xxx009",email:"yen@edu.vn",pos:"Giáo viên",subj:"CN lớp 3C",lv:"TH",qual:"ĐHSP",yr:2015,drive:''},{id:10,name:"Trịnh Văn Đức",gender:"Nam",dob:"01/12/1984",phone:"0912xxx010",email:"duc@edu.vn",pos:"Tổ trưởng",subj:"CN lớp 4A",lv:"TH",qual:"ThS",yr:2006,drive:''},{id:11,name:"Lý Thị Hương",gender:"Nữ",dob:"25/10/1988",phone:"0912xxx011",email:"huong@edu.vn",pos:"Giáo viên",subj:"CN lớp 4B",lv:"TH",qual:"ĐHSP",yr:2010,drive:''},{id:12,name:"Phan Thị Oanh",gender:"Nữ",dob:"19/05/1985",phone:"0912xxx012",email:"oanh@edu.vn",pos:"Giáo viên",subj:"CN lớp 5A",lv:"TH",qual:"ĐHSP",yr:2007,drive:''},{id:13,name:"Đinh Văn Nam",gender:"Nam",dob:"08/03/1987",phone:"0912xxx013",email:"nam@edu.vn",pos:"Giáo viên",subj:"CN lớp 5B",lv:"TH",qual:"ĐHSP",yr:2009,drive:''},{id:14,name:"Nguyễn Văn Hùng",gender:"Nam",dob:"14/07/1982",phone:"0912xxx014",email:"hung@edu.vn",pos:"Tổ trưởng",subj:"Toán-Tin",lv:"THCS",qual:"ThS",yr:2004,drive:''},{id:15,name:"Trần Thị Thanh",gender:"Nữ",dob:"30/11/1986",phone:"0912xxx015",email:"thanh@edu.vn",pos:"Giáo viên",subj:"Ngữ văn",lv:"THCS",qual:"ĐHSP",yr:2008,drive:''},{id:16,name:"Lê Văn Tuấn",gender:"Nam",dob:"05/09/1983",phone:"0912xxx016",email:"tuan@edu.vn",pos:"Giáo viên",subj:"KHTN",lv:"THCS",qual:"ĐHSP",yr:2005,drive:''},{id:17,name:"Phạm Thị Ngọc",gender:"Nữ",dob:"22/04/1990",phone:"0912xxx017",email:"ngoc@edu.vn",pos:"Giáo viên",subj:"Tiếng Anh",lv:"THCS",qual:"ĐHSP",yr:2012,drive:''},{id:18,name:"Hoàng Văn Minh",gender:"Nam",dob:"10/01/1981",phone:"0912xxx018",email:"minh@edu.vn",pos:"Tổ trưởng",subj:"KHXH",lv:"THCS",qual:"ThS",yr:2003,drive:''},{id:19,name:"Võ Thị Bích",gender:"Nữ",dob:"17/06/1989",phone:"0912xxx019",email:"bich@edu.vn",pos:"Giáo viên",subj:"Thể dục",lv:"THCS",qual:"ĐHSP",yr:2011,drive:''},{id:20,name:"Đặng Văn Thắng",gender:"Nam",dob:"28/08/1984",phone:"0912xxx020",email:"thang@edu.vn",pos:"Giáo viên",subj:"Công nghệ",lv:"THCS",qual:"ĐHSP",yr:2006,drive:''},{id:21,name:"Bùi Thị Phượng",gender:"Nữ",dob:"03/12/1991",phone:"0912xxx021",email:"phuong@edu.vn",pos:"Giáo viên",subj:"Âm nhạc-MT",lv:"THCS",qual:"ĐHSP",yr:2013,drive:''},
+{id:25,name:"Nguyễn Thị Hạnh",gender:"Nữ",dob:"05/04/1988",phone:"0912xxx025",email:"hanh.kt@edu.vn",pos:"Nhân viên",subj:"Kế toán",lv:"TH",qual:"ĐH",yr:2010,drive:''},
+{id:26,name:"Trần Văn Tùng",gender:"Nam",dob:"12/09/1990",phone:"0912xxx026",email:"tung.tv@edu.vn",pos:"Nhân viên",subj:"Thư viện - Thiết bị",lv:"TH",qual:"ĐH",yr:2012,drive:''}];
 var G=[{id:1,n:"Khối 1",c:3,s:98,i:"🌱",g:"linear-gradient(135deg,#60a5fa,#3B82F6)"},{id:2,n:"Khối 2",c:3,s:102,i:"🌻",g:"linear-gradient(135deg,#3b82f6,#2563EB)"},{id:3,n:"Khối 3",c:3,s:95,i:"⚙️",g:"linear-gradient(135deg,#2563eb,#1D4ED8)"},{id:4,n:"Khối 4",c:2,s:78,i:"🏆",g:"linear-gradient(135deg,#1d4ed8,#1E40AF)"},{id:5,n:"Khối 5",c:2,s:82,i:"🎓",g:"linear-gradient(135deg,#1e40af,#1E3A8A)"},{id:6,n:"Khối 6",c:2,s:72,i:"📘",g:"linear-gradient(135deg,#3b82f6,#2563EB)"},{id:7,n:"Khối 7",c:2,s:68,i:"📗",g:"linear-gradient(135deg,#2563eb,#1D4ED8)"},{id:8,n:"Khối 8",c:2,s:65,i:"📙",g:"linear-gradient(135deg,#1d4ed8,#1E40AF)"},{id:9,n:"Khối 9",c:2,s:60,i:"📕",g:"linear-gradient(135deg,#1e40af,#1E3A8A)"}];
 var CL={1:[{n:"1A",t:"Nguyễn Thị Hoa",s:33},{n:"1B",t:"Trần Thị Mai",s:33},{n:"1C",t:"Lê Thị Lan",s:32}],2:[{n:"2A",t:"Phạm Thị Thu",s:34},{n:"2B",t:"Hoàng Thị Nga",s:34},{n:"2C",t:"Võ Thị Hằng",s:34}],3:[{n:"3A",t:"Đặng Thị Linh",s:32},{n:"3B",t:"Bùi Thị Trang",s:32},{n:"3C",t:"Ngô Thị Yến",s:31}],4:[{n:"4A",t:"Trịnh Văn Đức",s:39},{n:"4B",t:"Lý Thị Hương",s:39}],5:[{n:"5A",t:"Phan Thị Oanh",s:41},{n:"5B",t:"Đinh Văn Nam",s:41}],6:[{n:"6A",t:"Nguyễn Văn Hùng",s:36},{n:"6B",t:"Trần Thị Thanh",s:36}],7:[{n:"7A",t:"Lê Văn Tuấn",s:34},{n:"7B",t:"Phạm Thị Ngọc",s:34}],8:[{n:"8A",t:"Hoàng Văn Minh",s:33},{n:"8B",t:"Võ Thị Bích",s:32}],9:[{n:"9A",t:"Đặng Văn Thắng",s:30},{n:"9B",t:"Bùi Thị Phượng",s:30}]};
 var DC=[{id:"01",t:"Hồ sơ Lãnh đạo & QL",ic:"📁",co:"#1e40af",de:"TC 1&2",su:[{c:"1.1",t:"Kế hoạch & Chiến lược",it:[{c:"1.1.1",t:"Tầm nhìn, sứ mệnh"},{c:"1.1.2",t:"KH giáo dục"},{c:"1.1.3",t:"Lịch công tác"},{c:"1.1.4",t:"Báo cáo sơ/tổng kết"}]},{c:"1.2",t:"Tổ chức - Nhân sự",it:[{c:"1.2.1",t:"DS trích ngang CBGV"},{c:"1.2.2",t:"Quyết định nội bộ"},{c:"1.2.3",t:"Đánh giá viên chức"},{c:"1.2.4",t:"Thi đua - Khen thưởng"}]},{c:"1.3",t:"Hành chính - Văn thư",it:[{c:"1.3.1",t:"Sổ đăng bộ"},{c:"1.3.2",t:"Sổ công văn"},{c:"1.3.3",t:"Văn bản pháp quy"},{c:"1.3.4",t:"Nghị quyết, BB"},{c:"1.3.5",t:"HS Hội nghị"}]},{c:"1.4",t:"Phổ cập GD",it:[{c:"1.4.1",t:"HS PCGD, xóa mù chữ"}]}]},{id:"02",t:"Hồ sơ Chuyên môn",ic:"📚",co:"#059669",de:"TC 5",su:[{c:"2.1",t:"Chỉ đạo CM",it:[{c:"2.1.1",t:"Quy chế CM"},{c:"2.1.2",t:"KH bồi dưỡng TX"}]},{c:"2.2",t:"CM Tiểu học",it:[{c:"2.2.1",t:"KH dạy học"},{c:"2.2.2",t:"Hồ sơ Tổ CM"},{c:"2.2.3",t:"Đánh giá (TT27)"}]},{c:"2.3",t:"CM THCS",it:[{c:"2.3.1",t:"KH dạy học THCS"},{c:"2.3.2",t:"HS Tổ CM THCS"},{c:"2.3.3",t:"BD HSG"},{c:"2.3.4",t:"ĐG (TT22)"}]},{c:"2.4",t:"E-Portfolio",it:[{c:"2.4.1",t:"Khối TH"},{c:"2.4.2",t:"Khối THCS"}]}]},{id:"03",t:"Tài nguyên DH",ic:"💡",co:"#d97706",de:"Không gian số",su:[{c:"3.1",t:"Thư viện TN",it:[{c:"3.1.1",t:"E-learning"},{c:"3.1.2",t:"Học liệu số"},{c:"3.1.3",t:"KHBD"}]},{c:"3.2",t:"Ngân hàng đề",it:[{c:"3.2.1",t:"Đề KT TH"},{c:"3.2.2",t:"Đề KT THCS"},{c:"3.2.3",t:"Đề HSG"}]},{c:"3.3",t:"SHCM",it:[{c:"3.3.1",t:"Video tiết dạy"},{c:"3.3.2",t:"Tập huấn"},{c:"3.3.3",t:"SKKN"}]}]},{id:"04",t:"Công tác HS & CN",ic:"👨‍🎓",co:"#dc2626",de:"TC 2&4",su:[{c:"4.1",t:"QL HS",it:[{c:"4.1.1",t:"Sĩ số"},{c:"4.1.2",t:"HS KT"}]},{c:"4.2",t:"Sổ CN TH",it:[{c:"4.2.1",t:"KH CN K1-5"},{c:"4.2.2",t:"Sổ CN"},{c:"4.2.3",t:"BB CMHS"}]},{c:"4.3",t:"Sổ CN THCS",it:[{c:"4.3.1",t:"KH CN K6-9"},{c:"4.3.2",t:"Sổ đầu bài"},{c:"4.3.3",t:"BB CMHS"}]}]},{id:"05",t:"TC-TS-TV-YT",ic:"🏥",co:"#7c3aed",de:"TC 3",su:[{c:"5.1",t:"Tài chính",it:[{c:"5.1.1",t:"QC chi tiêu"},{c:"5.1.2",t:"Công khai"}]},{c:"5.2",t:"Tài sản",it:[{c:"5.2.1",t:"Sổ TS"},{c:"5.2.2",t:"Mượn/trả"}]},{c:"5.3",t:"Thư viện",it:[{c:"5.3.1",t:"Sổ sách"},{c:"5.3.2",t:"DM SGK"}]},{c:"5.4",t:"Y tế",it:[{c:"5.4.1",t:"KH PCCC"},{c:"5.4.2",t:"Sổ SK"}]}]},{id:"06",t:"Đảng, Đoàn thể",ic:"🏛️",co:"#be185d",de:"TC 1&4",su:[{c:"6.1",t:"Đảng bộ",it:[{c:"6.1.1",t:"HS ĐB"},{c:"6.1.2",t:"CB TH"},{c:"6.1.3",t:"CB THCS"}]},{c:"6.2",t:"Đoàn & Đội",it:[{c:"6.2.1",t:"Chi đoàn"},{c:"6.2.2",t:"HĐ Đội"},{c:"6.2.3",t:"Thi đua"}]},{c:"6.3",t:"Các Ban",it:[{c:"6.3.1",t:"TTRA ND"},{c:"6.3.2",t:"ĐD CMHS"}]}]},{id:"07",t:"KĐ & ĐBCL",ic:"✅",co:"#0369a1",de:"TĐG",su:[{c:"7.1",t:"Tự ĐG",it:[{c:"7.1.1",t:"VB chỉ đạo"},{c:"7.1.2",t:"BC TĐG"},{c:"7.1.3",t:"Mã hóa MC"}]},{c:"7.2",t:"ĐBCL",it:[{c:"7.2.1",t:"Tổ ĐBCL"},{c:"7.2.2",t:"KH ĐBCL"},{c:"7.2.3",t:"Cam kết"},{c:"7.2.4",t:"KT GS"},{c:"7.2.5",t:"Phụ lục"},{c:"7.2.6",t:"Thi đua"}]}]}];
 var SB=[{k:"overview",i:"📊",l:"Tổng quan"},{k:"students",i:"📋",l:"DS HS"},{k:"stats",i:"📈",l:"Thống kê"},{k:"plan",i:"📝",l:"KH CN"},{k:"meeting",i:"👨‍👩‍👧",l:"Họp PH"}];
 var tA=G.reduce(function(a,g){return a+g.s},0),nTH=T.filter(function(x){return x.lv==='TH'}).length,nCS=T.filter(function(x){return x.lv==='THCS'}).length;
-var isAdmin=false,S={page:"home",gradeId:null,cls:null,stab:"overview",edoc:null,cbLv:"th",selT:null,atab:"school"};
+var isAdmin=false,S={page:"home",gradeId:null,cls:null,stab:"overview",edoc:null,cbLv:"th",selT:null,atab:"school",cbTab:"lanhdao",adminClass:null};
+var _adminStudents=null,editingHSRow=-1;
+var _dcExpand={};
+function isLD(p){return /Hiệu trưởng|Phó HT|Phó Hiệu/.test(p)}
+function isNV(p){return p==='Nhân viên'}
+function isGV(p){return !isLD(p)&&!isNV(p)}
 function toast(m,t){var e=document.getElementById('toast');e.className='toast '+(t||'success');e.innerHTML=m;setTimeout(function(){e.classList.add('show')},10);setTimeout(function(){e.classList.remove('show')},3000)}
 function openLogin(){document.getElementById('loginModal').classList.add('show');document.getElementById('loginPass').value='';document.getElementById('loginError').style.display='none';setTimeout(function(){document.getElementById('loginPass').focus()},200)}
 function closeLogin(){document.getElementById('loginModal').classList.remove('show')}
@@ -385,7 +430,7 @@ function setN(k){document.querySelectorAll('.hdr-link').forEach(function(b){b.cl
 function showPage(p){document.getElementById('landing').style.display=p==='home'?'block':'none';document.getElementById('app').style.display=p==='home'?'none':'block'}
 function goHome(){S.page="home";S.selT=null;setN("home");showPage("home");window.scrollTo({top:0,behavior:'smooth'})}
 function goDocs(){S.page="docs";S.edoc=null;setN("docs");showPage("inner");render()}
-function goCBGV(){S.page="cbgv";S.selT=null;setN("cbgv");showPage("inner");render()}
+function goCBGV(){S.page="cbgv";S.selT=null;S.cbTab="lanhdao";setN("cbgv");showPage("inner");render()}
 function goAdmin(){if(isAdmin){S.page="admin";S.atab="school";showPage("inner");render();return}openLogin()}
 function goGrades(){S.page="grades";showPage("inner");render()}
 function goSearch(){S.page="search";showPage("inner");render()}
@@ -459,11 +504,421 @@ function fileMauHS(){downloadXLSX('File_mau_HocSinh.xlsx','DanhSachHocSinh',
    ['2','Trần Thị Bảo','Nữ','22/09/2017','1A','1','TH','Trần Văn Cường','0912 345 ...','Xã Yên Thành','']],
   [{wch:5},{wch:22},{wch:9},{wch:12},{wch:7},{wch:7},{wch:7},{wch:22},{wch:14},{wch:18},{wch:14}]
 )}
+// ── Định dạng ngày (xử lý ISO, serial date Excel, dd/mm/yyyy) ──
+function fmtDate(d){if(!d)return '';var s=String(d);if(/^\d{2}\/\d{2}\/\d{4}$/.test(s))return s;if(typeof d==='number'&&d>25000&&d<60000){var dt=new Date((d-25569)*86400000);return('0'+dt.getUTCDate()).slice(-2)+'/'+('0'+(dt.getUTCMonth()+1)).slice(-2)+'/'+dt.getUTCFullYear()}var dt2=new Date(d);if(!isNaN(dt2.getTime()))return('0'+dt2.getDate()).slice(-2)+'/'+('0'+(dt2.getMonth()+1)).slice(-2)+'/'+dt2.getFullYear();return s}
+// ── Xuất DS CBGV hiện tại ra Excel (đúng format bảng) ──
+function exportGV(){
+  var headers=['STT','Họ và tên','Giới tính','Ngày sinh','SĐT','Email','Chức vụ','Bộ môn / Lớp CN','Cấp','Trình độ','Năm VN','Link Google Drive'];
+  var rows=T.map(function(t,i){return[i+1,t.name,t.gender,fmtDate(t.dob),t.phone,t.email,t.pos,t.subj,t.lv,t.qual,t.yr,t.drive||'']});
+  downloadXLSX('CBGV_HopThanh_'+new Date().toISOString().slice(0,10)+'.xlsx','DanhSachCBGV',headers,rows,
+    [{wch:5},{wch:24},{wch:9},{wch:13},{wch:14},{wch:18},{wch:12},{wch:18},{wch:7},{wch:10},{wch:8},{wch:42}]);
+}
+// ── Xuất DS Lớp hiện tại ra Excel ──
+function exportLop(){
+  var headers=['STT','Mã lớp','Tên lớp','Khối','Cấp','GVCN','Sĩ số'];var rows=[],stt=0;
+  G.forEach(function(g){(CL[g.id]||[]).forEach(function(c){stt++;rows.push([stt,c.n,'Lớp '+c.n,g.id,g.id>5?'THCS':'TH',c.t,c.s])})});
+  downloadXLSX('LopHoc_HopThanh_'+new Date().toISOString().slice(0,10)+'.xlsx','DanhSachLop',headers,rows,
+    [{wch:5},{wch:9},{wch:12},{wch:7},{wch:7},{wch:24},{wch:7}]);
+}
+// ── Trigger file upload ──
+function importGV(){document.getElementById('fileImportGV').click()}
+function importLop(){document.getElementById('fileImportLop').click()}
+function importHS(){document.getElementById('fileImportHS').click()}
+// ── Xử lý import CBGV từ Excel ──
+function handleImportGV(e){
+  var file=e.target.files[0];if(!file)return;e.target.value='';
+  toast('⏳ Đang đọc file '+file.name+'...','warning');
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    var data=new Uint8Array(ev.target.result);
+    var wb=XLSX.read(data,{type:'array'});
+    var ws=wb.Sheets[wb.SheetNames[0]];
+    var json=XLSX.utils.sheet_to_json(ws,{header:1});
+    // Tìm dòng tiêu đề (scan 10 dòng đầu)
+    var hIdx=-1,hdr;
+    for(var i=0;i<Math.min(json.length,10);i++){
+      if(json[i]&&json[i].some(function(c){return/họ.*tên|tên.*gv/i.test(String(c))})){hIdx=i;hdr=json[i];break}
+    }
+    if(hIdx<0){toast('⚠️ Không tìm thấy cột "Họ và tên" trong file!','warning');return}
+    // Map cột tự động (linh hoạt tên cột)
+    var cm={};
+    hdr.forEach(function(h,ci){var hl=String(h||'').toLowerCase().trim();
+      if(/họ.*tên|tên.*gv/.test(hl))cm.name=ci;
+      else if(hl==='gt'||/giới/.test(hl))cm.gender=ci;
+      else if(/ngày|sinh/.test(hl))cm.dob=ci;
+      else if(/sđt|điện|phone/.test(hl))cm.phone=ci;
+      else if(/email/.test(hl))cm.email=ci;
+      else if(/chức/.test(hl))cm.pos=ci;
+      else if(/môn|lớp cn|bộ môn/.test(hl))cm.subj=ci;
+      else if(/cấp/.test(hl)&&!/trình/.test(hl))cm.lv=ci;
+      else if(/tđ|trình.*độ/.test(hl))cm.qual=ci;
+      else if(/năm/.test(hl)&&!/ngày/.test(hl))cm.yr=ci;
+      else if(/drive|link/.test(hl))cm.drive=ci;
+    });
+    if(cm.name===undefined){toast('⚠️ Không map được cột "Họ và tên"!','warning');return}
+    // Parse dữ liệu
+    var added=0,skipped=0,maxId=T.reduce(function(a,t){return Math.max(a,t.id)},0);
+    for(var r=hIdx+1;r<json.length;r++){
+      var row=json[r];if(!row)continue;
+      var name=String(row[cm.name]||'').trim();if(!name)continue;
+      if(T.some(function(t){return t.name===name})){skipped++;continue}
+      maxId++;
+      T.push({id:maxId,name:name,
+        gender:cm.gender!=null?String(row[cm.gender]||'').trim()||'Nữ':'Nữ',
+        dob:cm.dob!=null?fmtDate(row[cm.dob]):'',
+        phone:cm.phone!=null?String(row[cm.phone]||'').trim():'',
+        email:cm.email!=null?String(row[cm.email]||'').trim():'',
+        pos:cm.pos!=null?String(row[cm.pos]||'').trim()||'Giáo viên':'Giáo viên',
+        subj:cm.subj!=null?String(row[cm.subj]||'').trim():'',
+        lv:cm.lv!=null?String(row[cm.lv]||'').trim()||'TH':'TH',
+        qual:cm.qual!=null?String(row[cm.qual]||'').trim()||'ĐHSP':'ĐHSP',
+        yr:cm.yr!=null?parseInt(row[cm.yr])||2020:2020,
+        drive:cm.drive!=null?String(row[cm.drive]||'').trim():''});
+      added++;
+    }
+    nTH=T.filter(function(x){return x.lv==='TH'}).length;
+    nCS=T.filter(function(x){return x.lv==='THCS'}).length;
+    if(added>0){
+      toast('✅ Đã import '+added+' giáo viên'+(skipped?' (bỏ qua '+skipped+' trùng tên)':'')+'!');
+      apiPost({action:'importTeachers',password:CONFIG.adminPass,teachers:T},function(r){
+        if(r&&r.success)toast('☁️ Đã đồng bộ '+T.length+' GV lên Google Sheets!');
+      });
+      render();
+    }else toast('⚠️ Không có dữ liệu mới'+(skipped?' ('+skipped+' trùng tên)':''),'warning');
+  };reader.readAsArrayBuffer(file);
+}
+// ── Xử lý import Lớp từ Excel ──
+function handleImportLop(e){
+  var file=e.target.files[0];if(!file)return;e.target.value='';
+  toast('⏳ Đang đọc file '+file.name+'...','warning');
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    var data=new Uint8Array(ev.target.result);
+    var wb=XLSX.read(data,{type:'array'});
+    var ws=wb.Sheets[wb.SheetNames[0]];
+    var json=XLSX.utils.sheet_to_json(ws,{header:1});
+    var hIdx=-1,hdr;
+    for(var i=0;i<Math.min(json.length,10);i++){
+      if(json[i]&&json[i].some(function(c){return/mã.*lớp|tên.*lớp/i.test(String(c))})){hIdx=i;hdr=json[i];break}
+    }
+    if(hIdx<0){toast('⚠️ Không tìm thấy dòng tiêu đề (Mã lớp)!','warning');return}
+    var cm={};
+    hdr.forEach(function(h,ci){var hl=String(h||'').toLowerCase().trim();
+      if(/mã.*lớp/.test(hl))cm.code=ci;
+      else if(/khối/.test(hl))cm.grade=ci;
+      else if(/gvcn|chủ nhiệm/.test(hl))cm.teacher=ci;
+      else if(/sĩ.*số|sỉ/.test(hl))cm.count=ci;
+    });
+    if(cm.code===undefined){toast('⚠️ Không tìm thấy cột "Mã lớp"!','warning');return}
+    var added=0;
+    for(var r=hIdx+1;r<json.length;r++){
+      var row=json[r];if(!row)continue;
+      var code=String(row[cm.code]||'').trim();if(!code)continue;
+      var grade=cm.grade!=null?parseInt(row[cm.grade]):parseInt(code);
+      if(!grade||grade<1||grade>9)continue;
+      if(!CL[grade])CL[grade]=[];
+      if(CL[grade].some(function(c){return c.n===code}))continue;
+      CL[grade].push({n:code,t:cm.teacher!=null?String(row[cm.teacher]||'').trim():'',s:cm.count!=null?parseInt(row[cm.count])||0:0});
+      var gObj=G.find(function(x){return x.id===grade});
+      if(gObj){gObj.c=CL[grade].length;gObj.s=CL[grade].reduce(function(a,c){return a+c.s},0)}
+      added++;
+    }
+    tA=G.reduce(function(a,g){return a+g.s},0);
+    if(added>0){toast('✅ Đã import '+added+' lớp!');render()}
+    else toast('⚠️ Không có lớp mới (trùng hoặc file rỗng)','warning');
+  };reader.readAsArrayBuffer(file);
+}
+// ── Xử lý import Học sinh từ Excel ──
+function handleImportHS(e){
+  var file=e.target.files[0];if(!file)return;e.target.value='';
+  toast('⏳ Đang xử lý file '+file.name+'...','warning');
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    var data=new Uint8Array(ev.target.result);
+    var wb=XLSX.read(data,{type:'array'});
+    var ws=wb.Sheets[wb.SheetNames[0]];
+    var json=XLSX.utils.sheet_to_json(ws,{header:1});
+    var hIdx=-1,hdr;
+    for(var i=0;i<Math.min(json.length,10);i++){
+      if(json[i]&&json[i].some(function(c){return/họ.*tên/i.test(String(c))})){hIdx=i;hdr=json[i];break}
+    }
+    if(hIdx<0){toast('⚠️ Không tìm thấy dòng tiêu đề!','warning');return}
+    var rows=[];
+    for(var r=hIdx+1;r<json.length;r++){
+      var row=json[r];if(!row)continue;
+      var hasData=hdr.some(function(h,ci){return String(row[ci]||'').trim()});
+      if(hasData)rows.push(row);
+    }
+    if(!rows.length){toast('⚠️ File rỗng!','warning');return}
+    toast('⏳ Đang gửi '+rows.length+' học sinh lên Google Sheets...','warning');
+    var students=rows.map(function(row){var obj={};hdr.forEach(function(h,ci){if(h)obj[String(h).trim()]=row[ci]!=null?String(row[ci]):''});return obj});
+    apiPost({action:'importStudents',password:CONFIG.adminPass,students:students},function(r){
+      if(r&&r.success)toast('✅ Đã import '+rows.length+' học sinh lên Sheets!');
+      else toast('⚠️ '+(r&&r.error?r.error:'API chưa hỗ trợ. Cần cập nhật Apps Script.'),'warning');
+    });
+  };reader.readAsArrayBuffer(file);
+}
+// ══ ADMIN STUDENTS — Hàm mới ══
+function selectAdminClass(cls){
+  S.adminClass=(S.adminClass===cls)?null:cls;
+  _adminStudents=null;editingHSRow=-1;
+  render(true);
+}
+function loadAdminStudents(className){
+  var el=document.getElementById('adminStudentTable');if(!el)return;
+  el.innerHTML='<div style="text-align:center;padding:20px;color:#3B5BDB"><div style="font-size:24px;margin-bottom:8px">⏳</div>Đang tải danh sách lớp <strong>'+className+'</strong> từ Google Sheets...</div>';
+  apiGet('getStudents&lop='+encodeURIComponent(className),function(data){
+    var el2=document.getElementById('adminStudentTable');if(!el2)return;
+    if(data.error){
+      _adminStudents=[];
+      el2.innerHTML='<div style="text-align:center;padding:20px;color:#dc2626">⚠️ Lỗi tải dữ liệu: <strong>'+data.error+'</strong><br><small style="color:#94a3b8">Kiểm tra kết nối mạng hoặc Apps Script deployment.</small></div>';
+      return;
+    }
+    if(!Array.isArray(data)){
+      _adminStudents=[];
+      el2.innerHTML='<div style="text-align:center;padding:20px;color:#94a3b8">Chưa có dữ liệu học sinh cho lớp <strong>'+className+'</strong>.<br>Hãy <strong>Upload Excel</strong> hoặc <strong>Thêm HS</strong> để bắt đầu.</div>';
+      return;
+    }
+    _adminStudents=data;
+    if(!data.length){
+      el2.innerHTML='<div style="text-align:center;padding:20px;color:#94a3b8">Danh sách lớp <strong>'+className+'</strong> trống.<br>Hãy <strong>Upload Excel</strong> hoặc <strong>Thêm HS</strong> để bắt đầu.</div>';
+      return;
+    }
+    renderAdminStudentTable();
+  });
+}
+function renderAdminStudentTable(){
+  var el=document.getElementById('adminStudentTable');if(!el||!_adminStudents)return;
+  var data=_adminStudents;
+  if(!data.length){el.innerHTML='<div style="text-align:center;padding:20px;color:#94a3b8">Danh sách trống. Hãy <strong>Upload Excel</strong> hoặc <strong>Thêm HS</strong>.</div>';return}
+  var nam=data.filter(function(s){return s.gender==='Nam'}).length,nu=data.length-nam;
+  var html='<div class="mini-stats" style="margin-bottom:14px"><div class="mini-stat" style="background:#dbeafe"><div class="mini-stat-val" style="color:#1e40af">'+data.length+'</div><div class="mini-stat-label">Sĩ số</div></div><div class="mini-stat" style="background:#e0f2fe"><div class="mini-stat-val" style="color:#0369a1">'+nam+'</div><div class="mini-stat-label">Nam</div></div><div class="mini-stat" style="background:#fce7f3"><div class="mini-stat-val" style="color:#be185d">'+nu+'</div><div class="mini-stat-label">Nữ</div></div></div>';
+  html+='<div style="overflow-x:auto"><table><thead><tr style="background:#3B5BDB"><th style="color:#fff;width:40px">STT</th><th style="color:#fff;min-width:160px">Họ và tên</th><th style="color:#fff;width:50px">GT</th><th style="color:#fff;width:90px">Ngày sinh</th><th style="color:#fff;min-width:130px">Phụ huynh</th><th style="color:#fff;width:100px">SĐT PH</th><th style="color:#fff;min-width:100px">Địa chỉ</th><th style="color:#fff;width:70px"></th></tr></thead><tbody>';
+  data.forEach(function(s,i){
+    if(editingHSRow===i){
+      html+='<tr class="edit-row" style="background:#eff6ff"><td style="text-align:center">'+(i+1)+'</td>';
+      html+='<td><input id="ehs_name" value="'+(s.name||'')+'"></td>';
+      html+='<td><select id="ehs_gender"><option'+(s.gender==='Nam'?' selected':'')+'>Nam</option><option'+(s.gender!=='Nam'?' selected':'')+'>Nữ</option></select></td>';
+      html+='<td><input id="ehs_dob" value="'+(fmtDate(s.dob)||'')+'"></td>';
+      html+='<td><input id="ehs_parent" value="'+(s.parent||'')+'"></td>';
+      html+='<td><input id="ehs_phone" value="'+(s.parentPhone||'')+'"></td>';
+      html+='<td><input id="ehs_addr" value="'+(s.address||'')+'"></td>';
+      html+='<td style="text-align:center"><button class="btn-action" style="background:#059669;color:#fff;border-color:#059669;padding:4px 8px;font-size:11px" onclick="saveEditHS('+i+')">Lưu</button> <button class="btn-action" style="padding:4px 8px;font-size:11px" onclick="cancelEditHS()">Hủy</button></td></tr>';
+    } else {
+      html+='<tr style="border-bottom:1px solid #e2e8f0'+(i%2?';background:#f8fafc':'')+'"><td style="text-align:center">'+(i+1)+'</td><td style="font-weight:600">'+(s.name||'')+'</td><td style="text-align:center">'+(s.gender||'')+'</td><td style="text-align:center">'+(fmtDate(s.dob)||'')+'</td><td>'+(s.parent||'')+'</td><td>'+(s.parentPhone||'')+'</td><td style="font-size:12px;color:#64748b">'+(s.address||'')+'</td>';
+      html+='<td style="text-align:center"><button class="btn-action" style="padding:3px 8px;font-size:11px" onclick="startEditHS('+i+')" title="Sửa">✏️</button> <button class="btn-action" style="padding:3px 8px;font-size:11px;color:#dc2626" onclick="deleteHS('+i+')" title="Xóa">🗑️</button></td></tr>';
+    }
+  });
+  html+='</tbody></table></div>';
+  el.innerHTML=html;
+}
+function startEditHS(i){editingHSRow=i;renderAdminStudentTable()}
+function cancelEditHS(){editingHSRow=-1;renderAdminStudentTable()}
+function saveEditHS(i){
+  if(!_adminStudents||!_adminStudents[i])return;
+  _adminStudents[i].name=document.getElementById('ehs_name').value.trim();
+  _adminStudents[i].gender=document.getElementById('ehs_gender').value;
+  _adminStudents[i].dob=document.getElementById('ehs_dob').value.trim();
+  _adminStudents[i].parent=document.getElementById('ehs_parent').value.trim();
+  _adminStudents[i].parentPhone=document.getElementById('ehs_phone').value.trim();
+  _adminStudents[i].address=document.getElementById('ehs_addr').value.trim();
+  editingHSRow=-1;
+  renderAdminStudentTable();
+  toast('✅ Đã cập nhật dòng '+(i+1)+' (nhấn "Lưu lên Sheets" để đồng bộ)');
+}
+function deleteHS(i){
+  if(!_adminStudents)return;
+  var name=_adminStudents[i].name||'HS #'+(i+1);
+  if(!confirm('Xóa "'+name+'" khỏi danh sách?'))return;
+  _adminStudents.splice(i,1);
+  editingHSRow=-1;
+  renderAdminStudentTable();
+  toast('🗑️ Đã xóa '+name+' (nhấn "Lưu lên Sheets" để đồng bộ)','warning');
+}
+function themHS(){
+  if(!S.adminClass){toast('⚠️ Chọn lớp trước!','warning');return}
+  document.getElementById('formHS').classList.add('show');
+  document.getElementById('formHS_title').textContent='Lớp: '+S.adminClass;
+  ['hs_name','hs_dob','hs_parent','hs_parentPhone','hs_address','hs_note'].forEach(function(id){var e=document.getElementById(id);if(e)e.value=''});
+}
+function submitHS(){
+  var name=document.getElementById('hs_name').value.trim();
+  if(!name){toast('⚠️ Nhập họ tên!','warning');return}
+  var gId=null;Object.keys(CL).forEach(function(k){(CL[k]||[]).forEach(function(c){if(c.n===S.adminClass)gId=parseInt(k)})});
+  var newS={name:name,gender:document.getElementById('hs_gender').value,dob:document.getElementById('hs_dob').value.trim(),
+    class:S.adminClass,grade:gId||'',level:gId&&gId>5?'THCS':'TH',
+    parent:document.getElementById('hs_parent').value.trim(),
+    parentPhone:document.getElementById('hs_parentPhone').value.trim(),
+    address:document.getElementById('hs_address').value.trim(),
+    note:document.getElementById('hs_note').value.trim()};
+  if(!_adminStudents)_adminStudents=[];
+  _adminStudents.push(newS);
+  document.getElementById('formHS').classList.remove('show');
+  renderAdminStudentTable();
+  toast('✅ Đã thêm '+name+' vào lớp '+S.adminClass);
+}
+function fileMauHSClass(){
+  if(!S.adminClass)return;
+  var gId=null;Object.keys(CL).forEach(function(k){(CL[k]||[]).forEach(function(c){if(c.n===S.adminClass)gId=parseInt(k)})});
+  var cap=gId&&gId>5?'THCS':'TH';
+  downloadXLSX('File_mau_HS_'+S.adminClass+'.xlsx','DanhSachHocSinh',
+    ['STT','Họ và tên','Giới tính','Ngày sinh','Lớp','Khối','Cấp','Họ tên PH','SĐT PH','Địa chỉ','Ghi chú'],
+    [['1','Nguyễn Văn A','Nam','15/06/2017',S.adminClass,gId||'',cap,'Nguyễn Văn B','0912 345 ...','Xã Yên Thành',''],
+     ['2','Trần Thị C','Nữ','22/09/2017',S.adminClass,gId||'',cap,'Trần Văn D','0912 345 ...','Xã Yên Thành','']],
+    [{wch:5},{wch:22},{wch:9},{wch:12},{wch:7},{wch:7},{wch:7},{wch:22},{wch:14},{wch:18},{wch:14}]);
+}
+function exportHSClass(){
+  if(!S.adminClass||!_adminStudents||!_adminStudents.length){toast('⚠️ Chưa có dữ liệu để xuất!','warning');return}
+  var gId=null;Object.keys(CL).forEach(function(k){(CL[k]||[]).forEach(function(c){if(c.n===S.adminClass)gId=parseInt(k)})});
+  var cap=gId&&gId>5?'THCS':'TH';
+  var headers=['STT','Họ và tên','Giới tính','Ngày sinh','Lớp','Khối','Cấp','Họ tên PH','SĐT PH','Địa chỉ','Ghi chú'];
+  var rows=_adminStudents.map(function(s,i){return[i+1,s.name||'',s.gender||'',fmtDate(s.dob)||'',S.adminClass,gId||'',cap,s.parent||'',s.parentPhone||'',s.address||'',s.note||'']});
+  downloadXLSX('DS_HS_'+S.adminClass+'_'+new Date().toISOString().slice(0,10)+'.xlsx','DanhSachHocSinh',headers,rows,
+    [{wch:5},{wch:22},{wch:9},{wch:12},{wch:7},{wch:7},{wch:7},{wch:22},{wch:14},{wch:18},{wch:14}]);
+}
+function importHSClass(){document.getElementById('fileImportHSClass').click()}
+function handleImportHSClass(e){
+  var file=e.target.files[0];if(!file)return;e.target.value='';
+  if(!S.adminClass){toast('⚠️ Chọn lớp trước!','warning');return}
+  toast('⏳ Đang đọc file '+file.name+'...','warning');
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    var data=new Uint8Array(ev.target.result);
+    var wb=XLSX.read(data,{type:'array'});
+    var ws=wb.Sheets[wb.SheetNames[0]];
+    var json=XLSX.utils.sheet_to_json(ws,{header:1});
+    var hIdx=-1,hdr;
+    for(var i=0;i<Math.min(json.length,10);i++){
+      if(json[i]&&json[i].some(function(c){return/họ.*tên/i.test(String(c))})){hIdx=i;hdr=json[i];break}
+    }
+    if(hIdx<0){toast('⚠️ Không tìm thấy cột "Họ và tên"!','warning');return}
+    var cm={};
+    hdr.forEach(function(h,ci){var hl=String(h||'').toLowerCase().trim();
+      if(/họ.*tên/.test(hl)&&!/ph/.test(hl))cm.name=ci;
+      else if(hl==='gt'||/giới/.test(hl))cm.gender=ci;
+      else if(/ngày|sinh/.test(hl))cm.dob=ci;
+      else if(/ph.*họ|họ.*ph|tên.*ph/.test(hl))cm.parent=ci;
+      else if(/sđt.*ph|đt.*ph|phone/.test(hl))cm.parentPhone=ci;
+      else if(/địa.*chỉ|đ\/c/.test(hl))cm.address=ci;
+      else if(/ghi/.test(hl))cm.note=ci;
+    });
+    if(cm.name===undefined){toast('⚠️ Không map được cột "Họ và tên"!','warning');return}
+    var gId=null;Object.keys(CL).forEach(function(k){(CL[k]||[]).forEach(function(c){if(c.n===S.adminClass)gId=parseInt(k)})});
+    var cap=gId&&gId>5?'THCS':'TH';
+    if(!_adminStudents)_adminStudents=[];
+    var added=0;
+    for(var r=hIdx+1;r<json.length;r++){
+      var row=json[r];if(!row)continue;
+      var name=cm.name!=null?String(row[cm.name]||'').trim():'';
+      if(!name)continue;
+      _adminStudents.push({name:name,
+        gender:cm.gender!=null?String(row[cm.gender]||'').trim()||'Nam':'Nam',
+        dob:cm.dob!=null?fmtDate(row[cm.dob]):'',
+        class:S.adminClass,grade:gId||'',level:cap,
+        parent:cm.parent!=null?String(row[cm.parent]||'').trim():'',
+        parentPhone:cm.parentPhone!=null?String(row[cm.parentPhone]||'').trim():'',
+        address:cm.address!=null?String(row[cm.address]||'').trim():'',
+        note:cm.note!=null?String(row[cm.note]||'').trim():''});
+      added++;
+    }
+    if(added>0){
+      toast('✅ Đã import '+added+' học sinh vào lớp '+S.adminClass);
+      renderAdminStudentTable();
+    }else toast('⚠️ Không có dữ liệu mới trong file','warning');
+  };reader.readAsArrayBuffer(file);
+}
+function saveStudentsToSheet(){
+  if(!S.adminClass){toast('⚠️ Chọn lớp trước!','warning');return}
+  if(!_adminStudents||!_adminStudents.length){toast('⚠️ Danh sách trống!','warning');return}
+  toast('⏳ Đang lưu '+_adminStudents.length+' HS lớp '+S.adminClass+' lên Sheets...','warning');
+  apiPost({action:'saveStudents',password:CONFIG.adminPass,className:S.adminClass,students:_adminStudents},function(r){
+    if(r&&r.success){
+      toast('✅ Đã lưu '+_adminStudents.length+' HS lớp '+S.adminClass+' lên Google Sheets!');
+      // Cập nhật sĩ số local
+      var gId=null;Object.keys(CL).forEach(function(k){(CL[k]||[]).forEach(function(c){if(c.n===S.adminClass){gId=parseInt(k);c.s=_adminStudents.length}})});
+      if(gId){var gObj=G.find(function(x){return x.id===gId});if(gObj)gObj.s=(CL[gId]||[]).reduce(function(a,c){return a+c.s},0)}
+      tA=G.reduce(function(a,g){return a+g.s},0);
+    }else toast('⚠️ '+(r&&r.error?r.error:'Lỗi khi lưu. Kiểm tra Apps Script.'),'warning');
+  });
+}
+// ══ ADMIN HỒ SƠ SỐ — Hàm quản lý danh mục ══
+function syncDCFromInputs(){
+  DC.forEach(function(cat,ci){
+    var e;
+    e=document.getElementById('dc_cat_'+ci+'_t');if(e)cat.t=e.value;
+    e=document.getElementById('dc_cat_'+ci+'_ic');if(e)cat.ic=e.value;
+    e=document.getElementById('dc_cat_'+ci+'_de');if(e)cat.de=e.value;
+    e=document.getElementById('dc_cat_'+ci+'_co');if(e)cat.co=e.value;
+    cat.su.forEach(function(sub,si){
+      e=document.getElementById('dc_sub_'+ci+'_'+si+'_t');if(e)sub.t=e.value;
+      sub.it.forEach(function(item,ii){
+        e=document.getElementById('dc_item_'+ci+'_'+si+'_'+ii+'_t');if(e)item.t=e.value;
+        var dk=item.c.replace(/\./g,'_');
+        e=document.getElementById('dc_link_'+dk+'_d');if(e){if(!CONFIG.links[item.c])CONFIG.links[item.c]={d:'',s:''};CONFIG.links[item.c].d=e.value.trim()}
+        e=document.getElementById('dc_link_'+dk+'_s');if(e){if(!CONFIG.links[item.c])CONFIG.links[item.c]={d:'',s:''};CONFIG.links[item.c].s=e.value.trim()}
+      });
+    });
+  });
+}
+function toggleDCAdmin(catId){
+  var body=document.getElementById('dc_body_'+catId);
+  var arrow=document.getElementById('dc_arrow_'+catId);
+  if(body){var show=body.style.display==='none';body.style.display=show?'block':'none';_dcExpand[catId]=show;if(arrow)arrow.style.transform='rotate('+(show?180:0)+'deg)'}
+}
+function adminRerender(){
+  syncDCFromInputs();
+  var sy=window.scrollY;
+  rAdmin(document.getElementById('app'));
+  window.scrollTo(0,sy);
+}
+function addDCSub(ci){
+  syncDCFromInputs();
+  var cat=DC[ci];var prefix=cat.id.replace(/^0/,'');
+  var newNum=cat.su.length+1;var newCode=prefix+'.'+newNum;
+  cat.su.push({c:newCode,t:'Mục mới',it:[]});
+  _dcExpand[cat.id]=true;
+  adminRerender();
+}
+function addDCItem(ci,si){
+  syncDCFromInputs();
+  var sub=DC[ci].su[si];
+  var newNum=sub.it.length+1;var newCode=sub.c+'.'+newNum;
+  sub.it.push({c:newCode,t:'Mục mới'});
+  CONFIG.links[newCode]={d:'',s:''};
+  _dcExpand[DC[ci].id]=true;
+  adminRerender();
+}
+function removeDCSub(ci,si){
+  syncDCFromInputs();
+  var sub=DC[ci].su[si];
+  if(!confirm('Xóa "'+sub.c+'. '+sub.t+'" và tất cả mục con?'))return;
+  sub.it.forEach(function(item){delete CONFIG.links[item.c]});
+  DC[ci].su.splice(si,1);
+  _dcExpand[DC[ci].id]=true;
+  adminRerender();
+}
+function removeDCItem(ci,si,ii){
+  syncDCFromInputs();
+  var item=DC[ci].su[si].it[ii];
+  if(!confirm('Xóa "'+item.c+'. '+item.t+'"?'))return;
+  delete CONFIG.links[item.c];
+  DC[ci].su[si].it.splice(ii,1);
+  _dcExpand[DC[ci].id]=true;
+  adminRerender();
+}
+function saveDanhMuc(){
+  syncDCFromInputs();
+  toast('⏳ Đang cập nhật danh mục lên Google Sheets...','warning');
+  apiPost({action:'saveDanhMuc',password:CONFIG.adminPass,categories:DC,links:CONFIG.links},function(r){
+    if(r&&r.success)toast('✅ Đã cập nhật danh mục và links lên Google Sheets!');
+    else toast('⚠️ '+(r&&r.error?r.error:'Lỗi khi lưu. Kiểm tra Apps Script.'),'warning');
+  });
+}
 function lnk(c){var l=CONFIG.links[c];if(!l)return '';return(l.d?'<a href="'+l.d+'" target="_blank" class="drive-chip drive">📁</a>':'<span class="drive-chip drive no-link">📁</span>')+(l.s?'<a href="'+l.s+'" target="_blank" class="drive-chip sheet">📊</a>':'<span class="drive-chip sheet no-link">📊</span>')}
-function render(){
+function render(noScroll){
   var a=document.getElementById('app');
   switch(S.page){case"grades":rGrades(a);break;case"grade":rGrade(a);break;case"class":rClass(a);break;case"docs":rDocs(a);break;case"cbgv":rCBGV(a);break;case"admin":rAdmin(a);break;case"search":rSearch(a);break;case"stats":rStats(a);break}
-  window.scrollTo({top:0,behavior:'smooth'});
+  if(!noScroll)window.scrollTo({top:0,behavior:'smooth'});
 }
 function rGrades(a){
   var gTH=G.filter(function(x){return x.id<=5}),gCS=G.filter(function(x){return x.id>5});
@@ -478,22 +933,51 @@ else if(t==='students'){h='<div class="panel"><h3>📋 Danh sách học sinh l�
 else if(t==='stats'){h='<div class="panel"><h3>📈 Thống kê</h3>'+[{l:"HT xuất sắc",p:30,c:"#15803d"},{l:"HT tốt",p:45,c:"#2563eb"},{l:"Hoàn thành",p:20,c:"#d97706"},{l:"Chưa HT",p:5,c:"#dc2626"}].map(function(d){return '<div class="progress-item"><div class="progress-header"><span>'+d.l+'</span><span style="font-weight:700;color:'+d.c+'">'+Math.round(c.s*d.p/100)+'</span></div><div class="progress-track"><div class="progress-fill" style="width:'+d.p+'%;background:'+d.c+'"></div></div></div>'}).join('')+'</div>'}
 else{h='<div class="panel" style="text-align:center;padding:40px;color:#94a3b8"><span style="font-size:40px">🚧</span><p style="margin-top:10px;font-weight:600">Đang phát triển</p></div>'}
 a.innerHTML='<div class="breadcrumb"><span class="link" onclick="goHome()">Trang chủ</span> › <span class="link" onclick="goGrades()">QL HS</span> › <span class="link" onclick="goGrade('+g.id+')">'+g.n+'</span> › <strong>'+c.n+'</strong></div><div class="class-layout"><div class="sidebar"><div class="sidebar-profile"><div class="sidebar-badge-icon" style="background:'+g.g+'">'+c.n+'</div><div style="font-weight:700;font-size:15px">Lớp '+c.n+'</div><div style="font-size:12px;color:#64748b">'+c.t+'</div><div style="font-size:13px;color:var(--blue);font-weight:600;margin-top:4px">'+c.s+' HS</div></div><div class="sidebar-menu">'+SB.map(function(x){return '<button class="sidebar-item '+(t===x.k?'active':'')+'" onclick="S.stab=\''+x.k+'\';render()"><span>'+x.i+'</span> '+x.l+'</button>'}).join('')+'</div></div><div class="content">'+h+'</div></div>'}
-function rCBGV(a){var lv=S.cbLv==='th'?'TH':'THCS',list=T.filter(function(x){return x.lv===lv});
-var bgh=T.filter(function(x){return x.pos==='Hiệu trưởng'||x.pos==='Phó HT'}).length;
-var ttg=T.filter(function(x){return x.pos==='Tổ trưởng'||x.pos==='Tổ phó'}).length;
-var gvCount=T.length-bgh-ttg;
+function rCBGV(a){
+var nLD=T.filter(function(x){return isLD(x.pos)}).length;
+var nGV=T.filter(function(x){return isGV(x.pos)}).length;
+var nNV=T.filter(function(x){return isNV(x.pos)}).length;
+var gvTH=T.filter(function(x){return isGV(x.pos)&&x.lv==='TH'}).length;
+var gvCS=T.filter(function(x){return isGV(x.pos)&&x.lv==='THCS'}).length;
+// ── Detail view ──
 if(S.selT){var t=S.selT;var driveRow=t.drive?'<div style="margin-top:16px;text-align:center"><a href="'+t.drive+'" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:10px 24px;border-radius:10px;background:#e8f5e9;color:#2e7d32;font-weight:700;font-size:14px;text-decoration:none;transition:all .2s" onmouseover="this.style.background=\'#c8e6c9\'" onmouseout="this.style.background=\'#e8f5e9\'">📂 Mở thư mục Google Drive</a></div>':'<div style="margin-top:16px;text-align:center;color:#94a3b8;font-size:13px">📂 Chưa có link Google Drive</div>';
-a.innerHTML='<button class="back-btn" onclick="S.selT=null;render()">← Quay lại</button><div class="teacher-detail"><div class="teacher-detail-header"><div class="teacher-avatar-lg" style="background:linear-gradient(135deg,'+posColor(t.pos).bg+','+posColor(t.pos).bg2+')">'+ini(t.name)+'</div><div><h2 style="font-size:20px;margin-bottom:4px">'+t.name+'</h2><div style="font-size:13px;color:#64748b">'+t.pos+' • '+t.subj+'</div></div></div>'+[{l:"Giới tính",v:t.gender},{l:"Ngày sinh",v:t.dob},{l:"Điện thoại",v:t.phone},{l:"Email",v:t.email},{l:"Chức vụ",v:t.pos},{l:"Bộ môn / Lớp",v:t.subj},{l:"Cấp",v:t.lv},{l:"Trình độ",v:t.qual},{l:"Năm vào ngành",v:t.yr}].map(function(r){return '<div class="teacher-info-row"><div class="teacher-info-label">'+r.l+'</div><div class="teacher-info-value">'+r.v+'</div></div>'}).join('')+driveRow+'</div>';return}
-a.innerHTML='<button class="back-btn" onclick="goHome()">← Trang chủ</button>'+
+a.innerHTML='<button class="back-btn" onclick="S.selT=null;render()">← Quay lại</button><div class="teacher-detail"><div class="teacher-detail-header"><div class="teacher-avatar-lg" style="background:linear-gradient(135deg,'+posColor(t.pos).bg+','+posColor(t.pos).bg2+')">'+ini(t.name)+'</div><div><h2 style="font-size:20px;margin-bottom:4px">'+t.name+'</h2><div style="font-size:13px;color:#64748b">'+t.pos+' • '+t.subj+'</div></div></div>'+[{l:"Giới tính",v:t.gender},{l:"Ngày sinh",v:fmtDate(t.dob)},{l:"Điện thoại",v:t.phone},{l:"Email",v:t.email},{l:"Chức vụ",v:t.pos},{l:"Bộ môn / Lớp",v:t.subj},{l:"Cấp",v:t.lv},{l:"Trình độ",v:t.qual},{l:"Năm vào ngành",v:t.yr}].map(function(r){return '<div class="teacher-info-row"><div class="teacher-info-label">'+r.l+'</div><div class="teacher-info-value">'+r.v+'</div></div>'}).join('')+driveRow+'</div>';return}
+// ── Header + Stats ──
+var html='<button class="back-btn" onclick="goHome()">← Trang chủ</button>'+
 '<div class="cbgv-header"><div class="cbgv-icon">👩‍🏫</div><div><h2 style="font-size:22px;font-weight:800;margin-bottom:2px">Hồ sơ năng lực CBGVNV</h2><div style="font-size:13px;color:#64748b">'+CONFIG.school.name+' · Năm học '+CONFIG.school.year+' · '+T.length+' cán bộ, giáo viên, nhân viên</div></div></div>'+
-'<div class="cbgv-stats"><div class="cbgv-stat"><div class="cbgv-stat-icon" style="background:#dbeafe;color:#2563eb">👥</div><div><div class="cbgv-stat-val" style="color:#2563eb">'+T.length+'</div><div class="cbgv-stat-lbl">Tổng CBGVNV</div></div></div><div class="cbgv-stat"><div class="cbgv-stat-icon" style="background:#fef3c7;color:#d97706">🎖️</div><div><div class="cbgv-stat-val" style="color:#d97706">'+bgh+'</div><div class="cbgv-stat-lbl">Ban Giám hiệu</div></div></div><div class="cbgv-stat"><div class="cbgv-stat-icon" style="background:#dcfce7;color:#059669">👩‍🏫</div><div><div class="cbgv-stat-val" style="color:#059669">'+gvCount+'</div><div class="cbgv-stat-lbl">Giáo viên</div></div></div><div class="cbgv-stat"><div class="cbgv-stat-icon" style="background:#ede9fe;color:#7c3aed">⭐</div><div><div class="cbgv-stat-val" style="color:#7c3aed">'+ttg+'</div><div class="cbgv-stat-lbl">Tổ trưởng/phó</div></div></div></div>'+
-'<div class="cbgv-search"><span style="font-size:16px;color:#94a3b8">🔍</span><input placeholder="Tìm kiếm giáo viên theo tên, chức vụ..." oninput="filterGV(this.value)"></div>'+
-'<div class="tab-switch" style="margin-bottom:16px"><button class="tab-btn '+(S.cbLv==='th'?'active':'')+'" onclick="S.cbLv=\'th\';S.selT=null;render()">📗 Tiểu học ('+nTH+')</button><button class="tab-btn '+(S.cbLv==='thcs'?'active':'')+'" onclick="S.cbLv=\'thcs\';S.selT=null;render()">📘 THCS ('+nCS+')</button></div>'+
-'<div class="cbgv-grid" id="gvGrid">'+list.map(function(t){var pc=posColor(t.pos);var driveBtn=t.drive?'<a href="'+t.drive+'" target="_blank" class="gv-folder" style="background:#e8f5e9;color:#2e7d32" title="Mở thư mục Drive" onclick="event.stopPropagation()">📂</a>':'<div class="gv-folder" style="background:#f1f5f9;color:#94a3b8" title="Chưa có link Drive">📂</div>';return '<div class="gv-card" onclick="S.selT=T.find(function(x){return x.id==='+t.id+'});render()"><div class="gv-card-line" style="background:linear-gradient(90deg,'+pc.bg+','+pc.bg2+')"></div><div class="gv-avatar" style="background:linear-gradient(135deg,'+pc.bg+','+pc.bg2+')">'+ini(t.name)+'</div><div class="gv-info"><div class="gv-name">'+t.name+'</div><div class="gv-pos" style="background:'+pc.light+';color:'+pc.bg+'">'+t.pos+'</div></div>'+driveBtn+'</div>'}).join('')+'</div>'}
+'<div class="cbgv-stats"><div class="cbgv-stat"><div class="cbgv-stat-icon" style="background:#dbeafe;color:#2563eb">👥</div><div><div class="cbgv-stat-val" style="color:#2563eb">'+T.length+'</div><div class="cbgv-stat-lbl">Tổng CBGVNV</div></div></div><div class="cbgv-stat"><div class="cbgv-stat-icon" style="background:#fee2e2;color:#dc2626">🎖️</div><div><div class="cbgv-stat-val" style="color:#dc2626">'+nLD+'</div><div class="cbgv-stat-lbl">Lãnh đạo</div></div></div><div class="cbgv-stat"><div class="cbgv-stat-icon" style="background:#dcfce7;color:#059669">👩‍🏫</div><div><div class="cbgv-stat-val" style="color:#059669">'+nGV+'</div><div class="cbgv-stat-lbl">Giáo viên</div></div></div><div class="cbgv-stat"><div class="cbgv-stat-icon" style="background:#f1f5f9;color:#64748b">👤</div><div><div class="cbgv-stat-val" style="color:#64748b">'+nNV+'</div><div class="cbgv-stat-lbl">Nhân viên</div></div></div></div>';
+// ── Search ──
+html+='<div class="cbgv-search"><span style="font-size:16px;color:#94a3b8">🔍</span><input placeholder="Tìm kiếm theo tên, chức vụ..." oninput="filterGV(this.value)"></div>';
+// ── 3 Tabs chính ──
+html+='<div class="tab-switch" style="margin-bottom:16px">'+
+'<button class="tab-btn '+(S.cbTab==='lanhdao'?'active':'')+'" onclick="S.cbTab=\'lanhdao\';S.selT=null;render()">🎖️ Lãnh đạo ('+nLD+')</button>'+
+'<button class="tab-btn '+(S.cbTab==='giaovien'?'active':'')+'" onclick="S.cbTab=\'giaovien\';S.selT=null;render()">👩‍🏫 Giáo viên ('+nGV+')</button>'+
+'<button class="tab-btn '+(S.cbTab==='nhanvien'?'active':'')+'" onclick="S.cbTab=\'nhanvien\';S.selT=null;render()">👤 Nhân viên ('+nNV+')</button></div>';
+// ── Tab content ──
+var list;
+if(S.cbTab==='lanhdao'){
+  list=T.filter(function(x){return isLD(x.pos)});
+} else if(S.cbTab==='giaovien'){
+  // Sub-tab TH / THCS
+  html+='<div class="tab-switch" style="margin-bottom:14px">'+
+  '<button class="tab-btn '+(S.cbLv==='th'?'active':'')+'" style="padding:6px 14px;font-size:12px" onclick="S.cbLv=\'th\';S.selT=null;render()">📗 Tiểu học ('+gvTH+')</button>'+
+  '<button class="tab-btn '+(S.cbLv==='thcs'?'active':'')+'" style="padding:6px 14px;font-size:12px" onclick="S.cbLv=\'thcs\';S.selT=null;render()">📘 THCS ('+gvCS+')</button></div>';
+  var lv=S.cbLv==='th'?'TH':'THCS';
+  list=T.filter(function(x){return isGV(x.pos)&&x.lv===lv});
+} else {
+  list=T.filter(function(x){return isNV(x.pos)});
+}
+// ── Grid cards ──
+html+='<div class="cbgv-grid" id="gvGrid">'+list.map(function(t){var pc=posColor(t.pos);var driveBtn=t.drive?'<a href="'+t.drive+'" target="_blank" class="gv-folder" style="background:#e8f5e9;color:#2e7d32" title="Mở thư mục Drive" onclick="event.stopPropagation()">📂</a>':'<div class="gv-folder" style="background:#f1f5f9;color:#94a3b8" title="Chưa có link Drive">📂</div>';return '<div class="gv-card" onclick="S.selT=T.find(function(x){return x.id==='+t.id+'});render()"><div class="gv-card-line" style="background:linear-gradient(90deg,'+pc.bg+','+pc.bg2+')"></div><div class="gv-avatar" style="background:linear-gradient(135deg,'+pc.bg+','+pc.bg2+')">'+ini(t.name)+'</div><div class="gv-info"><div class="gv-name">'+t.name+'</div><div class="gv-pos" style="background:'+pc.light+';color:'+pc.bg+'">'+t.pos+'</div></div>'+driveBtn+'</div>'}).join('');
+if(!list.length) html+='<div style="grid-column:1/-1;text-align:center;padding:40px;color:#94a3b8">Chưa có dữ liệu</div>';
+html+='</div>';
+a.innerHTML=html;
+}
 function posColor(p){
-  if(p==='Hiệu trưởng'||p==='Phó HT')return{bg:'#2563eb',bg2:'#1e40af',light:'#dbeafe'};
+  if(isLD(p))return{bg:'#dc2626',bg2:'#b91c1c',light:'#fee2e2'};
   if(p==='Tổ trưởng')return{bg:'#0891b2',bg2:'#0e7490',light:'#cffafe'};
   if(p==='Tổ phó')return{bg:'#7c3aed',bg2:'#6d28d9',light:'#ede9fe'};
+  if(isNV(p))return{bg:'#64748b',bg2:'#475569',light:'#f1f5f9'};
   return{bg:'#3B5BDB',bg2:'#4C6EF5',light:'#eef2ff'};
 }
 function filterGV(q){
@@ -502,22 +986,86 @@ function filterGV(q){
   cards.forEach(function(c){var name=c.querySelector('.gv-name').textContent.toLowerCase();var pos=c.querySelector('.gv-pos').textContent.toLowerCase();c.style.display=(name.indexOf(q)>=0||pos.indexOf(q)>=0)?'flex':'none'});
 }
 function rAdmin(a){if(!isAdmin)return goHome();var t=S.atab;
-var tabs='<div class="admin-tabs">'+[{k:"school",l:"🏫 Trường"},{k:"cbgv",l:"👩‍🏫 CBGV"},{k:"classes",l:"🏠 Lớp"},{k:"students",l:"🎒 HS"},{k:"links",l:"🔗 Links"}].map(function(x){return '<button class="admin-tab'+(t===x.k?' active':'')+'" onclick="S.atab=\''+x.k+'\';render()">'+x.l+'</button>'}).join('')+'</div>',ct='';
+var tabs='<div class="admin-tabs">'+[{k:"school",l:"🏫 Trường"},{k:"cbgv",l:"👩‍🏫 CBGV"},{k:"classes",l:"🏠 Lớp"},{k:"students",l:"🎒 HS"},{k:"hoso",l:"📂 Hồ sơ"},{k:"links",l:"🔗 Links"}].map(function(x){return '<button class="admin-tab'+(t===x.k?' active':'')+'" onclick="S.atab=\''+x.k+'\';render()">'+x.l+'</button>'}).join('')+'</div>',ct='';
 if(t==='school'){var s=CONFIG.school;ct='<div class="panel"><h3>🏫 Thông tin trường</h3>'+[{l:"Tên trường",v:s.name,k:"name"},{l:"Địa chỉ",v:s.address,k:"address"},{l:"Hiệu trưởng",v:s.principal,k:"principal"},{l:"SĐT",v:s.phone,k:"phone"},{l:"Email",v:s.email,k:"email"},{l:"Năm học",v:s.year,k:"year"}].map(function(f){return '<div class="form-group"><label>'+f.l+'</label><input class="form-input" value="'+(f.v||'')+'" id="cfg_'+f.k+'"></div>'}).join('')+'<button class="btn-save" onclick="saveSchool()">☁️ Lưu lên Google Sheets</button></div>'}
-else if(t==='cbgv'){ct='<div class="panel"><h3>👩‍🏫 DANH SÁCH CÁN BỘ GIÁO VIÊN</h3><div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap"><button class="btn-action primary" onclick="fileMauGV()">📥 Tải file mẫu Excel</button><button class="btn-action" onclick="openSheetTab(\'DanhSachCBGV\')">📤 Sửa trên Google Sheet</button><button class="btn-action" style="background:#059669;color:#fff;border-color:#059669" onclick="themGV()">➕ Thêm GV</button></div><div style="overflow-x:auto"><table><thead><tr style="background:#3B5BDB"><th style="color:#fff;width:40px">STT</th><th style="color:#fff;min-width:150px">Họ và tên</th><th style="color:#fff;width:55px">GT</th><th style="color:#fff;width:90px">Ngày sinh</th><th style="color:#fff;width:100px">SĐT</th><th style="color:#fff;min-width:120px">Email</th><th style="color:#fff;width:85px">Chức vụ</th><th style="color:#fff;min-width:110px">Bộ môn/Lớp</th><th style="color:#fff;width:50px">Cấp</th><th style="color:#fff;width:55px">TĐ</th><th style="color:#fff;width:50px">Năm</th><th style="color:#fff;width:65px">📂 Drive</th></tr></thead><tbody>'+T.map(function(x,i){var rcol=x.pos==="Tổ trưởng"||x.pos==="Hiệu trưởng"?"background:#dcfce7;color:#15803d;font-weight:700":"";var ccol=x.lv==="THCS"?"background:#dbeafe;color:#2563eb;font-weight:700":"";var drv=x.drive?'<a href="'+x.drive+'" target="_blank" style="color:#2e7d32;font-weight:600;text-decoration:none" title="'+x.drive+'">📂 Mở</a>':'<span style="color:#cbd5e1">—</span>';return "<tr style='border-bottom:1px solid #e2e8f0"+(i%2===1?";background:#f8fafc":"")+"'><td style='text-align:center'>"+(i+1)+"</td><td style='font-weight:600'>"+x.name+"</td><td style='text-align:center'>"+x.gender+"</td><td style='text-align:center'>"+x.dob+"</td><td>"+x.phone+"</td><td style='font-size:12px'>"+x.email+"</td><td style='"+rcol+"'>"+x.pos+"</td><td>"+x.subj+"</td><td style='text-align:center;"+ccol+"'>"+x.lv+"</td><td style='text-align:center'>"+x.qual+"</td><td style='text-align:center'>"+x.yr+"</td><td style='text-align:center'>"+drv+"</td></tr>"}).join("")+'</tbody></table></div></div>'}
-else if(t==='classes'){ct='<div class="panel"><h3>🏠 DANH SÁCH LỚP HỌC</h3><div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap"><button class="btn-action primary" onclick="fileMauLop()">📥 Tải file mẫu Excel</button><button class="btn-action" onclick="openSheetTab(\'DanhSachLop\')">📤 Sửa trên Google Sheet</button><button class="btn-action" style="background:#059669;color:#fff;border-color:#059669" onclick="themLop()">➕ Thêm lớp</button></div><div style="overflow-x:auto"><table><thead><tr style="background:#059669"><th style="color:#fff;width:40px">STT</th><th style="color:#fff;width:65px">Mã lớp</th><th style="color:#fff;width:90px">Tên lớp</th><th style="color:#fff;width:50px">Khối</th><th style="color:#fff;width:55px">Cấp</th><th style="color:#fff;min-width:160px">GVCN</th><th style="color:#fff;width:55px">Sĩ số</th></tr></thead><tbody>';var stt=0;ct+=G.map(function(g){return(CL[g.id]||[]).map(function(c){stt++;var ccol=g.id>5?"background:#dbeafe;color:#2563eb;font-weight:700":"background:#dcfce7;color:#059669;font-weight:700";return "<tr style='border-bottom:1px solid #e2e8f0"+(stt%2===0?";background:#f8fafc":"")+"'><td style='text-align:center'>"+stt+"</td><td style='text-align:center;font-weight:700'>"+c.n+"</td><td>Lớp "+c.n+"</td><td style='text-align:center'>"+g.id+"</td><td style='text-align:center;"+ccol+"'>"+(g.id>5?"THCS":"TH")+"</td><td>"+c.t+"</td><td style='text-align:center;font-weight:700'>"+c.s+"</td></tr>"}).join("")}).join("")+'</tbody></table></div></div>'}
+else if(t==='cbgv'){ct='<div class="panel"><h3>👩‍🏫 DANH SÁCH CÁN BỘ GIÁO VIÊN</h3><div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap"><button class="btn-action primary" onclick="fileMauGV()">📥 Tải file mẫu Excel</button><button class="btn-action" onclick="openSheetTab(\'DanhSachCBGV\')">📤 Sửa trên Google Sheet</button><button class="btn-action" style="background:#059669;color:#fff;border-color:#059669" onclick="themGV()">➕ Thêm GV</button><button class="btn-action" style="background:#2563eb;color:#fff;border-color:#2563eb" onclick="exportGV()">📊 Xuất Excel</button><button class="btn-action" style="background:#d97706;color:#fff;border-color:#d97706" onclick="importGV()">📤 Upload Excel</button></div><div style="overflow-x:auto"><table><thead><tr style="background:#3B5BDB"><th style="color:#fff;width:40px">STT</th><th style="color:#fff;min-width:150px">Họ và tên</th><th style="color:#fff;width:55px">GT</th><th style="color:#fff;width:90px">Ngày sinh</th><th style="color:#fff;width:100px">SĐT</th><th style="color:#fff;min-width:120px">Email</th><th style="color:#fff;width:85px">Chức vụ</th><th style="color:#fff;min-width:110px">Bộ môn/Lớp</th><th style="color:#fff;width:50px">Cấp</th><th style="color:#fff;width:55px">TĐ</th><th style="color:#fff;width:50px">Năm</th><th style="color:#fff;width:65px">📂 Drive</th></tr></thead><tbody>'+T.map(function(x,i){var rcol=x.pos==="Tổ trưởng"||x.pos==="Hiệu trưởng"?"background:#dcfce7;color:#15803d;font-weight:700":"";var ccol=x.lv==="THCS"?"background:#dbeafe;color:#2563eb;font-weight:700":"";var drv=x.drive?'<a href="'+x.drive+'" target="_blank" style="color:#2e7d32;font-weight:600;text-decoration:none" title="'+x.drive+'">📂 Mở</a>':'<span style="color:#cbd5e1">—</span>';return "<tr style='border-bottom:1px solid #e2e8f0"+(i%2===1?";background:#f8fafc":"")+"'><td style='text-align:center'>"+(i+1)+"</td><td style='font-weight:600'>"+x.name+"</td><td style='text-align:center'>"+x.gender+"</td><td style='text-align:center'>"+fmtDate(x.dob)+"</td><td>"+x.phone+"</td><td style='font-size:12px'>"+x.email+"</td><td style='"+rcol+"'>"+x.pos+"</td><td>"+x.subj+"</td><td style='text-align:center;"+ccol+"'>"+x.lv+"</td><td style='text-align:center'>"+x.qual+"</td><td style='text-align:center'>"+x.yr+"</td><td style='text-align:center'>"+drv+"</td></tr>"}).join("")+'</tbody></table></div></div>'}
+else if(t==='classes'){ct='<div class="panel"><h3>🏠 DANH SÁCH LỚP HỌC</h3><div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap"><button class="btn-action primary" onclick="fileMauLop()">📥 Tải file mẫu Excel</button><button class="btn-action" onclick="openSheetTab(\'DanhSachLop\')">📤 Sửa trên Google Sheet</button><button class="btn-action" style="background:#059669;color:#fff;border-color:#059669" onclick="themLop()">➕ Thêm lớp</button><button class="btn-action" style="background:#2563eb;color:#fff;border-color:#2563eb" onclick="exportLop()">📊 Xuất Excel</button><button class="btn-action" style="background:#d97706;color:#fff;border-color:#d97706" onclick="importLop()">📤 Upload Excel</button></div><div style="overflow-x:auto"><table><thead><tr style="background:#059669"><th style="color:#fff;width:40px">STT</th><th style="color:#fff;width:65px">Mã lớp</th><th style="color:#fff;width:90px">Tên lớp</th><th style="color:#fff;width:50px">Khối</th><th style="color:#fff;width:55px">Cấp</th><th style="color:#fff;min-width:160px">GVCN</th><th style="color:#fff;width:55px">Sĩ số</th></tr></thead><tbody>';var stt=0;ct+=G.map(function(g){return(CL[g.id]||[]).map(function(c){stt++;var ccol=g.id>5?"background:#dbeafe;color:#2563eb;font-weight:700":"background:#dcfce7;color:#059669;font-weight:700";return "<tr style='border-bottom:1px solid #e2e8f0"+(stt%2===0?";background:#f8fafc":"")+"'><td style='text-align:center'>"+stt+"</td><td style='text-align:center;font-weight:700'>"+c.n+"</td><td>Lớp "+c.n+"</td><td style='text-align:center'>"+g.id+"</td><td style='text-align:center;"+ccol+"'>"+(g.id>5?"THCS":"TH")+"</td><td>"+c.t+"</td><td style='text-align:center;font-weight:700'>"+c.s+"</td></tr>"}).join("")}).join("")+'</tbody></table></div></div>'}
 else if(t==='students'){
   var thCls=G.filter(function(x){return x.id<=5}),tcsCls=G.filter(function(x){return x.id>5});
   var thTotal=thCls.reduce(function(a,g){return a+(CL[g.id]||[]).reduce(function(b,c){return b+c.s},0)},0);
   var csTotal=tcsCls.reduce(function(a,g){return a+(CL[g.id]||[]).reduce(function(b,c){return b+c.s},0)},0);
-  ct='<div class="panel"><h3>🎒 DANH SÁCH HỌC SINH</h3><div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap"><button class="btn-action primary" onclick="fileMauHS()">📥 Tải file mẫu Excel</button><button class="btn-action" onclick="openSheetTab(\'DanhSachHocSinh\')">📤 Sửa trên Google Sheet</button></div>'+
+  var ac=S.adminClass;
+  ct='<div class="panel"><h3>🎒 DANH SÁCH HỌC SINH</h3>'+
+  '<p style="color:#64748b;font-size:13px;margin-bottom:16px">Chọn lớp bên dưới để xem và chỉnh sửa danh sách học sinh.</p>'+
   '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">'+
-  '<div style="background:#f0fdf4;border-radius:14px;padding:18px;border:1px solid #bbf7d0"><h4 style="margin:0 0 14px;color:#059669;display:flex;align-items:center;gap:6px;font-size:15px">📗 Cấp Tiểu học <span style="font-size:12px;font-weight:400;color:#64748b">'+thTotal+' HS</span></h4><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px">'+thCls.map(function(g){return(CL[g.id]||[]).map(function(c){return '<button class="btn-action" style="justify-content:center;background:#dcfce7;color:#059669;border-color:#86efac;font-weight:700;padding:8px 6px" onclick="openSheetTab(\'DanhSachHocSinh\')">'+c.n+' <small>('+c.s+')</small></button>'}).join('')}).join('')+'</div></div>'+
-  '<div style="background:#eff6ff;border-radius:14px;padding:18px;border:1px solid #93c5fd"><h4 style="margin:0 0 14px;color:#2563eb;display:flex;align-items:center;gap:6px;font-size:15px">📘 Cấp THCS <span style="font-size:12px;font-weight:400;color:#64748b">'+csTotal+' HS</span></h4><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px">'+tcsCls.map(function(g){return(CL[g.id]||[]).map(function(c){return '<button class="btn-action" style="justify-content:center;background:#dbeafe;color:#2563eb;border-color:#93c5fd;font-weight:700;padding:8px 6px" onclick="openSheetTab(\'DanhSachHocSinh\')">'+c.n+' <small>('+c.s+')</small></button>'}).join('')}).join('')+'</div></div>'+
-  '</div></div>'}
+  '<div style="background:#f0fdf4;border-radius:14px;padding:18px;border:1px solid #bbf7d0"><h4 style="margin:0 0 14px;color:#059669;display:flex;align-items:center;gap:6px;font-size:15px">📗 Cấp Tiểu học <span style="font-size:12px;font-weight:400;color:#64748b">'+thTotal+' HS</span></h4><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px">'+thCls.map(function(g){return(CL[g.id]||[]).map(function(c){var sel=ac===c.n;return '<button class="btn-action'+(sel?' selected':'')+'" style="justify-content:center;'+(sel?'':'background:#dcfce7;color:#059669;border-color:#86efac;')+'font-weight:700;padding:8px 6px" onclick="selectAdminClass(\''+c.n+'\')">'+c.n+' <small>('+c.s+')</small></button>'}).join('')}).join('')+'</div></div>'+
+  '<div style="background:#eff6ff;border-radius:14px;padding:18px;border:1px solid #93c5fd"><h4 style="margin:0 0 14px;color:#2563eb;display:flex;align-items:center;gap:6px;font-size:15px">📘 Cấp THCS <span style="font-size:12px;font-weight:400;color:#64748b">'+csTotal+' HS</span></h4><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px">'+tcsCls.map(function(g){return(CL[g.id]||[]).map(function(c){var sel=ac===c.n;return '<button class="btn-action'+(sel?' selected':'')+'" style="justify-content:center;'+(sel?'':'background:#dbeafe;color:#2563eb;border-color:#93c5fd;')+'font-weight:700;padding:8px 6px" onclick="selectAdminClass(\''+c.n+'\')">'+c.n+' <small>('+c.s+')</small></button>'}).join('')}).join('')+'</div></div>'+
+  '</div>';
+  // ── Inline student panel khi chọn lớp ──
+  if(ac){
+    var gId=null;Object.keys(CL).forEach(function(k){(CL[k]||[]).forEach(function(c){if(c.n===ac)gId=parseInt(k)})});
+    var clObj=gId?(CL[gId]||[]).find(function(c){return c.n===ac}):null;
+    var gvcn=clObj?clObj.t:'';
+    var khoi=gId||'';var cap=gId&&gId>5?'THCS':'TH';
+    ct+='<div class="admin-hs-panel">'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">'+
+    '<h3 style="margin:0">📋 Danh sách học sinh lớp <strong style="color:var(--blue)">'+ac+'</strong>'+(gvcn?' — GVCN: '+gvcn:'')+'</h3>'+
+    '<button class="btn-action" onclick="S.adminClass=null;render()" style="font-size:11px">✕ Đóng</button></div>'+
+    '<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">'+
+    '<button class="btn-action primary" onclick="fileMauHSClass()">📥 Xuất file mẫu</button>'+
+    '<button class="btn-action" style="background:#d97706;color:#fff;border-color:#d97706" onclick="importHSClass()">📤 Upload Excel</button>'+
+    '<button class="btn-action" style="background:#059669;color:#fff;border-color:#059669" onclick="themHS()">➕ Thêm HS</button>'+
+    '<button class="btn-action" style="background:#2563eb;color:#fff;border-color:#2563eb" onclick="saveStudentsToSheet()">☁️ Lưu lên Sheets</button>'+
+    '<button class="btn-action" onclick="exportHSClass()">📊 Xuất DS lớp</button></div>'+
+    '<div id="adminStudentTable" style="text-align:center;padding:20px;color:#94a3b8">⏳ Đang tải danh sách...</div>'+
+    '</div>';
+  }
+  ct+='</div>'}
+else if(t==='hoso'){
+  ct='<div class="panel"><h3>📂 DANH MỤC HỒ SƠ SỐ</h3>'+
+  '<p style="color:#64748b;font-size:13px;margin-bottom:16px">Chỉnh sửa tên danh mục, thêm/xóa mục con, sửa link Drive/Sheet. Sau khi chỉnh xong, nhấn <strong>Cập nhật lên Google Sheets</strong>.</p>'+
+  '<div style="margin-bottom:20px"><button class="btn-save" onclick="saveDanhMuc()">☁️ Cập nhật lên Google Sheets</button></div>';
+  DC.forEach(function(cat,ci){
+    var exp=_dcExpand[cat.id];
+    ct+='<div style="border:1px solid #e2e8f0;border-left:4px solid '+cat.co+';border-radius:10px;margin-bottom:12px;background:#fff">'+
+    '<div style="padding:12px 16px;display:flex;align-items:center;gap:8px;cursor:pointer" onclick="toggleDCAdmin(\''+cat.id+'\')">'+
+    '<span id="dc_arrow_'+cat.id+'" style="transition:transform .2s;transform:rotate('+(exp?180:0)+'deg);font-size:12px;color:#64748b">▼</span>'+
+    '<input id="dc_cat_'+ci+'_ic" value="'+cat.ic+'" style="width:36px;text-align:center;font-size:18px;border:1px solid #e2e8f0;border-radius:6px;padding:4px" onclick="event.stopPropagation()">'+
+    '<span style="background:'+cat.co+';color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:700">'+cat.id+'</span>'+
+    '<input id="dc_cat_'+ci+'_t" value="'+cat.t+'" style="flex:1;font-weight:700;font-size:14px;border:1px solid #e2e8f0;border-radius:6px;padding:6px 10px" onclick="event.stopPropagation()">'+
+    '<input id="dc_cat_'+ci+'_de" value="'+(cat.de||'')+'" style="width:100px;font-size:12px;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;color:#64748b" placeholder="Mô tả" onclick="event.stopPropagation()">'+
+    '<input type="color" id="dc_cat_'+ci+'_co" value="'+cat.co+'" style="width:32px;height:28px;border:none;cursor:pointer;border-radius:4px" onclick="event.stopPropagation()">'+
+    '</div>'+
+    '<div id="dc_body_'+cat.id+'" style="display:'+(exp?'block':'none')+';padding:0 16px 16px;border-top:1px solid #f1f5f9">';
+    cat.su.forEach(function(sub,si){
+      ct+='<div style="margin-top:12px;padding:10px 12px;background:#f8fafc;border-radius:8px;border:1px solid #e8ecf1">'+
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'+
+      '<span style="font-weight:700;color:'+cat.co+';font-size:13px;min-width:40px">'+sub.c+'</span>'+
+      '<input id="dc_sub_'+ci+'_'+si+'_t" value="'+sub.t+'" style="flex:1;font-weight:600;font-size:13px;border:1px solid #e2e8f0;border-radius:6px;padding:5px 8px" placeholder="Tên danh mục con">'+
+      '<button class="btn-action" style="font-size:11px;padding:4px 8px;background:#059669;color:#fff;border-color:#059669" onclick="addDCItem('+ci+','+si+')">➕ Thêm mục</button>'+
+      '<button class="btn-action" style="font-size:11px;padding:4px 8px;color:#dc2626" onclick="removeDCSub('+ci+','+si+')">🗑️</button>'+
+      '</div>';
+      sub.it.forEach(function(item,ii){
+        var l=CONFIG.links[item.c]||{d:'',s:''};
+        var dk=item.c.replace(/\./g,'_');
+        ct+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;padding-left:48px">'+
+        '<span style="font-size:12px;color:#94a3b8;min-width:44px">'+item.c+'</span>'+
+        '<input id="dc_item_'+ci+'_'+si+'_'+ii+'_t" value="'+item.t+'" style="width:150px;font-size:12px;border:1px solid #e2e8f0;border-radius:5px;padding:5px 8px" placeholder="Tên mục">'+
+        '<input id="dc_link_'+dk+'_d" value="'+l.d+'" placeholder="📁 Link Drive" style="flex:1;font-size:11px;border:1px solid #e2e8f0;border-radius:5px;padding:5px 8px;color:#64748b">'+
+        '<input id="dc_link_'+dk+'_s" value="'+l.s+'" placeholder="📊 Link Sheet" style="flex:1;font-size:11px;border:1px solid #e2e8f0;border-radius:5px;padding:5px 8px;color:#64748b">'+
+        '<button class="btn-action" style="font-size:10px;padding:3px 6px;color:#dc2626" onclick="removeDCItem('+ci+','+si+','+ii+')">✕</button>'+
+        '</div>';
+      });
+      ct+='</div>';
+    });
+    ct+='<button class="btn-action" style="margin-top:10px;font-size:12px;background:'+cat.co+';color:#fff;border-color:'+cat.co+'" onclick="addDCSub('+ci+')">➕ Thêm danh mục con</button>'+
+    '</div></div>';
+  });
+  ct+='<div style="margin-top:20px"><button class="btn-save" onclick="saveDanhMuc()">☁️ Cập nhật lên Google Sheets</button></div></div>'}
 else if(t==='links'){var ai=[];DC.forEach(function(c){c.su.forEach(function(s){s.it.forEach(function(i){ai.push(i)})})});
 ct='<div class="panel"><h3>🔗 Link Drive/Sheet</h3><p style="color:#64748b;font-size:13px;margin-bottom:16px">Dán link → <strong>Lưu lên Google Sheets</strong> để cập nhật trang web tự động.</p>'+ai.map(function(i){var l=CONFIG.links[i.c]||{d:'',s:''};return '<div class="link-row"><span class="link-code">'+i.c+'</span><span class="link-name">'+i.t+'</span><input class="link-input" placeholder="Drive..." value="'+l.d+'" id="ld_'+i.c.replace(/\./g,'_')+'"><input class="link-input" placeholder="Sheet..." value="'+l.s+'" id="ls_'+i.c.replace(/\./g,'_')+'"></div>'}).join('')+'<div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap"><button class="btn-save" onclick="saveLinks()">☁️ Lưu lên Google Sheets</button><button class="btn-save" style="background:#64748b" onclick="downloadHTML()">📥 Tải file HTML (backup)</button></div></div>'}
-a.innerHTML='<button class="back-btn" onclick="goHome()">← Trang chủ</button><div class="section-head"><div class="section-bar" style="background:#1e3a5f"></div><h2 class="section-title">⚙️ Quản trị</h2></div>'+tabs+ct}
+a.innerHTML='<button class="back-btn" onclick="goHome()">← Trang chủ</button><div class="section-head"><div class="section-bar" style="background:#1e3a5f"></div><h2 class="section-title">⚙️ Quản trị</h2></div>'+tabs+ct;
+if(t==='students'&&S.adminClass)setTimeout(function(){loadAdminStudents(S.adminClass)},100)}
 function saveSchool(){
   ['name','address','principal','phone','email','year'].forEach(function(k){var e=document.getElementById('cfg_'+k);if(e)CONFIG.school[k]=e.value});
   toast('⏳ Đang lưu lên Google Sheets...','warning');
@@ -675,6 +1223,11 @@ function loadFromAPI(){
         g.s=cls.reduce(function(a,c){return a+c.s},0);
       });
       tA=G.reduce(function(a,g){return a+g.s},0);
+    }
+    // Cập nhật danh mục hồ sơ từ Sheets (nếu có)
+    if(data.danhMuc&&data.danhMuc.categories&&data.danhMuc.categories.length>0){
+      DC=data.danhMuc.categories;
+      if(data.danhMuc.links){Object.keys(data.danhMuc.links).forEach(function(k){var v=data.danhMuc.links[k];if(v&&(v.d||v.s)){if(!CONFIG.links[k])CONFIG.links[k]={d:'',s:''};if(v.d)CONFIG.links[k].d=v.d;if(v.s)CONFIG.links[k].s=v.s}})}
     }
     // Cập nhật links
     // Merge links từ Sheets (chỉ ghi đè nếu Sheets có link thật, giữ link nhúng sẵn)
