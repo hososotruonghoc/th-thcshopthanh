@@ -338,7 +338,7 @@ td{padding:10px 12px;border-bottom:1px solid #f1f5f9}
       <div><label style="font-size:12px;font-weight:600;color:#475569">Ngày sinh</label><input class="form-input" id="gv_dob" placeholder="dd/mm/yyyy"></div>
       <div><label style="font-size:12px;font-weight:600;color:#475569">Số điện thoại</label><input class="form-input" id="gv_phone" placeholder="0912 345 ..."></div>
       <div><label style="font-size:12px;font-weight:600;color:#475569">Email</label><input class="form-input" id="gv_email" placeholder="email@edu.vn"></div>
-      <div><label style="font-size:12px;font-weight:600;color:#475569">Chức vụ</label><select class="form-input" id="gv_pos"><option>Giáo viên</option><option>Tổ trưởng</option><option>Tổ phó</option><option>Phó Hiệu trưởng</option><option>Hiệu trưởng</option><option>Nhân viên</option></select></div>
+      <div><label style="font-size:12px;font-weight:600;color:#475569">Chức vụ</label><select class="form-input" id="gv_pos"><option>Giáo viên</option><option>Tổ trưởng</option><option>Tổ phó</option><option>GV TPT Đội</option><option>Phó Hiệu trưởng</option><option>Hiệu trưởng</option><option>Nhân viên</option></select></div>
       <div><label style="font-size:12px;font-weight:600;color:#475569">Bộ môn / Lớp CN</label><input class="form-input" id="gv_subj" placeholder="CN lớp 1A / Toán"></div>
       <div><label style="font-size:12px;font-weight:600;color:#475569">Cấp</label><select class="form-input" id="gv_lv"><option>TH</option><option>THCS</option></select></div>
       <div><label style="font-size:12px;font-weight:600;color:#475569">Trình độ</label><select class="form-input" id="gv_qual"><option>ĐHSP</option><option>ThS</option><option>TS</option><option>CĐSP</option></select></div>
@@ -475,8 +475,8 @@ var tA=G.reduce(function(a,g){return a+g.s},0),nTH=T.filter(function(x){return x
 var isAdmin=false,S={page:"home",gradeId:null,cls:null,stab:"overview",edoc:null,cbLv:"th",selT:null,atab:"school",cbTab:"lanhdao",adminClass:null};
 var _adminStudents=null,editingHSRow=-1;
 var _dcExpand={};
-function isLD(p){return /Hiệu trưởng|Phó HT|Phó Hiệu/.test(p)}
-function isNV(p){return p==='Nhân viên'}
+function isLD(p){return /hiệu trưởng/i.test(p)}
+function isNV(p){return !isLD(p)&&(/nhân viên|^y tế|thư viện|kế toán/i.test(p))}
 function isGV(p){return !isLD(p)&&!isNV(p)}
 function toast(m,t){var e=document.getElementById('toast');e.className='toast '+(t||'success');e.innerHTML=m;setTimeout(function(){e.classList.add('show')},10);setTimeout(function(){e.classList.remove('show')},3000)}
 function openLogin(){document.getElementById('loginModal').classList.add('show');document.getElementById('loginPass').value='';document.getElementById('loginError').style.display='none';setTimeout(function(){document.getElementById('loginPass').focus()},200)}
@@ -1078,9 +1078,9 @@ a.innerHTML=html;
 }
 function posColor(p){
   if(isLD(p))return{bg:'#dc2626',bg2:'#b91c1c',light:'#fee2e2'};
-  if(p==='Tổ trưởng')return{bg:'#0891b2',bg2:'#0e7490',light:'#cffafe'};
-  if(p==='Tổ phó')return{bg:'#7c3aed',bg2:'#6d28d9',light:'#ede9fe'};
-  if(p==='GV TPT Đội')return{bg:'#d97706',bg2:'#b45309',light:'#fef3c7'};
+  if(/tổ trưởng/i.test(p))return{bg:'#0891b2',bg2:'#0e7490',light:'#cffafe'};
+  if(/tổ phó/i.test(p))return{bg:'#7c3aed',bg2:'#6d28d9',light:'#ede9fe'};
+  if(/TPT|Đội/i.test(p))return{bg:'#d97706',bg2:'#b45309',light:'#fef3c7'};
   if(isNV(p))return{bg:'#64748b',bg2:'#475569',light:'#f1f5f9'};
   return{bg:'#3B5BDB',bg2:'#4C6EF5',light:'#eef2ff'};
 }
@@ -1328,7 +1328,11 @@ function updateHero(){
 var CACHE_KEY='ht_cache_data';
 var CACHE_TS_KEY='ht_cache_ts';
 var CACHE_HS_PREFIX='ht_hs_';
+var CACHE_VER_KEY='ht_cache_ver';
+var CACHE_VER='v4';
 var _lastSyncTs=0;
+// Xóa cache cũ khi phiên bản thay đổi
+(function(){try{if(localStorage.getItem(CACHE_VER_KEY)!==CACHE_VER){localStorage.removeItem(CACHE_KEY);localStorage.removeItem(CACHE_TS_KEY);localStorage.setItem(CACHE_VER_KEY,CACHE_VER)}}catch(e){}})();
 
 function cacheSet(key,val){try{localStorage.setItem(key,JSON.stringify(val))}catch(e){}}
 function cacheGet(key){try{var v=localStorage.getItem(key);return v?JSON.parse(v):null}catch(e){return null}}
