@@ -242,6 +242,7 @@ td{padding:10px 12px;border-bottom:1px solid #f1f5f9}
     <button class="hdr-link" id="nav-cbgv" onclick="goCBGV()">Hồ sơ CBGV</button>
     <button class="hdr-cta" onclick="goAdmin()">→ Quản trị</button>
   </nav>
+  <div id="syncStatus" style="font-size:11px;white-space:nowrap;margin-left:8px"></div>
 </div></div></div>
 
 <!-- LANDING PAGE -->
@@ -450,7 +451,8 @@ function submitGV(){
   document.getElementById('formGV').classList.remove('show');
   toast('⏳ Đang lưu...','warning');
   apiPost({action:'addTeacher',password:CONFIG.adminPass,teacher:newT},function(r){
-    toast(r.success?'✅ Đã thêm: '+name:'⚠️ Lưu local: '+(r.error||''),'success');
+    if(r.success){toast('✅ Đã thêm: '+name);refreshCache()}
+    else toast('⚠️ Lưu local: '+(r.error||''),'warning');
   });
   render();
 }
@@ -666,20 +668,40 @@ function selectAdminClass(cls){
 }
 function loadAdminStudents(className){
   var el=document.getElementById('adminStudentTable');if(!el)return;
-  el.innerHTML='<div style="text-align:center;padding:20px;color:#3B5BDB"><div style="font-size:24px;margin-bottom:8px">⏳</div>Đang tải danh sách lớp <strong>'+className+'</strong> từ Google Sheets...</div>';
+  // Bước 1: Hiện cache ngay nếu có
+  var cached=cacheGet(CACHE_HS_PREFIX+className);
+  if(cached&&cached.data&&cached.data.length>0){
+    _adminStudents=cached.data;
+    renderAdminStudentTable();
+    // Ghi nhỏ: đang tải bản mới
+    var info=document.createElement('div');
+    info.id='hsLoadingHint';
+    info.style.cssText='text-align:center;padding:6px;color:#3B5BDB;font-size:11px';
+    info.innerHTML='🔄 Đang đồng bộ bản mới từ Sheets...';
+    el.parentNode.insertBefore(info,el);
+  } else {
+    el.innerHTML='<div style="text-align:center;padding:20px;color:#3B5BDB"><div style="font-size:24px;margin-bottom:8px">⏳</div>Đang tải danh sách lớp <strong>'+className+'</strong> từ Google Sheets...</div>';
+  }
+  // Bước 2: Tải từ API
   apiGet('getStudents&lop='+encodeURIComponent(className),function(data){
     var el2=document.getElementById('adminStudentTable');if(!el2)return;
+    var hint=document.getElementById('hsLoadingHint');if(hint)hint.remove();
     if(data.error){
-      _adminStudents=[];
-      el2.innerHTML='<div style="text-align:center;padding:20px;color:#dc2626">⚠️ Lỗi tải dữ liệu: <strong>'+data.error+'</strong><br><small style="color:#94a3b8">Kiểm tra kết nối mạng hoặc Apps Script deployment.</small></div>';
+      if(!cached||!cached.data||!cached.data.length){
+        _adminStudents=[];
+        el2.innerHTML='<div style="text-align:center;padding:20px;color:#dc2626">⚠️ Lỗi tải dữ liệu: <strong>'+data.error+'</strong><br><small style="color:#94a3b8">Kiểm tra kết nối mạng hoặc Apps Script.</small></div>';
+      }
       return;
     }
     if(!Array.isArray(data)){
-      _adminStudents=[];
-      el2.innerHTML='<div style="text-align:center;padding:20px;color:#94a3b8">Chưa có dữ liệu học sinh cho lớp <strong>'+className+'</strong>.<br>Hãy <strong>Upload Excel</strong> hoặc <strong>Thêm HS</strong> để bắt đầu.</div>';
+      if(!cached||!cached.data||!cached.data.length){
+        _adminStudents=[];
+        el2.innerHTML='<div style="text-align:center;padding:20px;color:#94a3b8">Chưa có dữ liệu học sinh cho lớp <strong>'+className+'</strong>.<br>Hãy <strong>Upload Excel</strong> hoặc <strong>Thêm HS</strong> để bắt đầu.</div>';
+      }
       return;
     }
     _adminStudents=data;
+    savStudentsCache(className,data);
     if(!data.length){
       el2.innerHTML='<div style="text-align:center;padding:20px;color:#94a3b8">Danh sách lớp <strong>'+className+'</strong> trống.<br>Hãy <strong>Upload Excel</strong> hoặc <strong>Thêm HS</strong> để bắt đầu.</div>';
       return;
@@ -838,6 +860,7 @@ function saveStudentsToSheet(){
       var gId=null;Object.keys(CL).forEach(function(k){(CL[k]||[]).forEach(function(c){if(c.n===S.adminClass){gId=parseInt(k);c.s=_adminStudents.length}})});
       if(gId){var gObj=G.find(function(x){return x.id===gId});if(gObj)gObj.s=(CL[gId]||[]).reduce(function(a,c){return a+c.s},0)}
       tA=G.reduce(function(a,g){return a+g.s},0);
+      savStudentsCache(S.adminClass,_adminStudents);refreshCache();
     }else toast('⚠️ '+(r&&r.error?r.error:'Lỗi khi lưu. Kiểm tra Apps Script.'),'warning');
   });
 }
@@ -908,10 +931,14 @@ function removeDCItem(ci,si,ii){
 }
 function saveDanhMuc(){
   syncDCFromInputs();
-  toast('⏳ Đang cập nhật danh mục lên Google Sheets...','warning');
-  apiPost({action:'saveDanhMuc',password:CONFIG.adminPass,categories:DC,links:CONFIG.links},function(r){
-    if(r&&r.success)toast('✅ Đã cập nhật danh mục và links lên Google Sheets!');
-    else toast('⚠️ '+(r&&r.error?r.error:'Lỗi khi lưu. Kiểm tra Apps Script.'),'warning');
+  toast('⏳ Đang cập nhật links lên Google Sheets...','warning');
+  apiPost({action:'saveLinks',password:CONFIG.adminPass,links:CONFIG.links},function(r1){
+    if(!r1||!r1.success){toast('⚠️ Lỗi lưu links: '+(r1&&r1.error?r1.error:'Kiểm tra Apps Script.'),'warning');return}
+    toast('⏳ Đang cập nhật danh mục lên Google Sheets...','warning');
+    apiPost({action:'saveDanhMuc',password:CONFIG.adminPass,categories:DC},function(r2){
+      if(r2&&r2.success){toast('✅ Đã cập nhật danh mục và links lên Google Sheets!');refreshCache()}
+      else toast('⚠️ '+(r2&&r2.error?r2.error:'Lỗi khi lưu danh mục. Kiểm tra Apps Script.'),'warning');
+    });
   });
 }
 function lnk(c){var l=CONFIG.links[c];if(!l)return '';return(l.d?'<a href="'+l.d+'" target="_blank" class="drive-chip drive">📁</a>':'<span class="drive-chip drive no-link">📁</span>')+(l.s?'<a href="'+l.s+'" target="_blank" class="drive-chip sheet">📊</a>':'<span class="drive-chip sheet no-link">📊</span>')}
@@ -1071,7 +1098,7 @@ function saveSchool(){
   toast('⏳ Đang lưu lên Google Sheets...','warning');
   var mapped={'Tên trường':CONFIG.school.name,'Địa chỉ':CONFIG.school.address,'Hiệu trưởng':CONFIG.school.principal,'Số điện thoại':CONFIG.school.phone,'Email':CONFIG.school.email,'Năm học':CONFIG.school.year};
   apiPost({action:'saveSchool',password:CONFIG.adminPass,school:mapped},function(r){
-    if(r&&r.success){toast('✅ Đã lưu lên Google Sheets!');updateHero()}
+    if(r&&r.success){toast('✅ Đã lưu lên Google Sheets!');updateHero();refreshCache()}
     else toast('⚠️ '+(r&&r.error?r.error:'Chưa lưu được, thử lại sau'),'warning');
   });
 }
@@ -1080,7 +1107,7 @@ function saveLinks(){
   ai.forEach(function(i){var k=i.c.replace(/\./g,'_'),d=document.getElementById('ld_'+k),s=document.getElementById('ls_'+k);if(!CONFIG.links[i.c])CONFIG.links[i.c]={d:'',s:''};if(d)CONFIG.links[i.c].d=d.value.trim();if(s)CONFIG.links[i.c].s=s.value.trim()});
   toast('⏳ Đang lưu lên Google Sheets...','warning');
   apiPost({action:'saveLinks',password:CONFIG.adminPass,links:CONFIG.links},function(r){
-    if(r.success) toast('✅ Đã lưu link lên Sheets!');
+    if(r.success){toast('✅ Đã lưu link lên Sheets!');refreshCache()}
     else toast('❌ Lỗi: '+(r.error||''),'warning');
   });
 }
@@ -1199,53 +1226,112 @@ function updateHero(){
   var sH=document.getElementById('sHS');if(sH)sH.textContent=tA;
   var sG=document.getElementById('sGV');if(sG)sG.textContent=T.length;
 }
+// ══ SMART STORAGE — localStorage cache + auto sync ══
+var CACHE_KEY='ht_cache_data';
+var CACHE_TS_KEY='ht_cache_ts';
+var CACHE_HS_PREFIX='ht_hs_';
+var _lastSyncTs=0;
+
+function cacheSet(key,val){try{localStorage.setItem(key,JSON.stringify(val))}catch(e){}}
+function cacheGet(key){try{var v=localStorage.getItem(key);return v?JSON.parse(v):null}catch(e){return null}}
+function cacheRemove(key){try{localStorage.removeItem(key)}catch(e){}}
+
+function saveToCache(data){
+  cacheSet(CACHE_KEY,data);
+  var ts=data._ts||Date.now();
+  cacheSet(CACHE_TS_KEY,ts);
+  _lastSyncTs=ts;
+  updateSyncStatus('online',ts);
+}
+function refreshCache(){
+  // Rebuild cache từ dữ liệu hiện tại trong bộ nhớ
+  var allClasses=[];
+  G.forEach(function(g){(CL[g.id]||[]).forEach(function(c){allClasses.push({code:c.n,name:'Lớp '+c.n,grade:g.id,level:g.id>5?'THCS':'TH',teacher:c.t,count:c.s})})});
+  var mapped={'Tên trường':CONFIG.school.name,'Địa chỉ':CONFIG.school.address,'Hiệu trưởng':CONFIG.school.principal||'','Số điện thoại':CONFIG.school.phone||'','Email':CONFIG.school.email||'','Năm học':CONFIG.school.year||''};
+  var cacheData={school:mapped,teachers:T,classes:allClasses,links:CONFIG.links,danhMuc:{categories:DC,links:CONFIG.links},_ts:Date.now()};
+  saveToCache(cacheData);
+}
+function savStudentsCache(cls,students){
+  cacheSet(CACHE_HS_PREFIX+cls,{data:students,ts:Date.now()});
+}
+
+function updateSyncStatus(status,ts){
+  var el=document.getElementById('syncStatus');if(!el)return;
+  var timeStr='';
+  if(ts){var d=new Date(ts);timeStr=d.toLocaleDateString('vi-VN')+' '+d.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})}
+  if(status==='online')el.innerHTML='<span style="color:#059669">🟢 Đã đồng bộ</span>'+(timeStr?' <small style="color:#94a3b8">'+timeStr+'</small>':'');
+  else if(status==='syncing')el.innerHTML='<span style="color:#d97706">🔄 Đang đồng bộ...</span>';
+  else if(status==='offline')el.innerHTML='<span style="color:#dc2626">🔴 Offline</span>'+(timeStr?' <small style="color:#94a3b8">Bản lưu: '+timeStr+'</small>':'');
+  else if(status==='cached')el.innerHTML='<span style="color:#3B5BDB">💾 Dữ liệu cached</span>'+(timeStr?' <small style="color:#94a3b8">'+timeStr+'</small>':'');
+}
+
+function applyData(data,source){
+  // Giáo viên
+  if(data.teachers&&data.teachers.length>0){
+    T=data.teachers;
+    nTH=T.filter(function(x){return x.lv==='TH'}).length;
+    nCS=T.filter(function(x){return x.lv==='THCS'}).length;
+  }
+  // Lớp học
+  if(data.classes&&data.classes.length>0){
+    CL={};G.forEach(function(g){CL[g.id]=[]});
+    data.classes.forEach(function(c){
+      var gId=parseInt(c.grade);
+      if(CL[gId]){CL[gId].push({n:c.code,t:c.teacher,s:parseInt(c.count)||0})}
+    });
+    G.forEach(function(g){var cls=CL[g.id]||[];g.c=cls.length;g.s=cls.reduce(function(a,c){return a+c.s},0)});
+    tA=G.reduce(function(a,g){return a+g.s},0);
+  }
+  // Danh mục hồ sơ
+  if(data.danhMuc&&data.danhMuc.categories&&data.danhMuc.categories.length>0){
+    DC=data.danhMuc.categories;
+    if(data.danhMuc.links){Object.keys(data.danhMuc.links).forEach(function(k){var v=data.danhMuc.links[k];if(v&&(v.d||v.s)){if(!CONFIG.links[k])CONFIG.links[k]={d:'',s:''};if(v.d)CONFIG.links[k].d=v.d;if(v.s)CONFIG.links[k].s=v.s}})}
+  }
+  // Links
+  if(data.links){Object.keys(data.links).forEach(function(k){var v=data.links[k];if(v&&(v.d||v.s)){if(!CONFIG.links[k])CONFIG.links[k]={d:'',s:''};if(v.d)CONFIG.links[k].d=v.d;if(v.s)CONFIG.links[k].s=v.s}})}
+  // Thông tin trường
+  if(data.school){
+    if(data.school['Tên trường'])CONFIG.school.name=data.school['Tên trường'];
+    if(data.school['Địa chỉ'])CONFIG.school.address=data.school['Địa chỉ'];
+    if(data.school['Hiệu trưởng'])CONFIG.school.principal=data.school['Hiệu trưởng'];
+    if(data.school['Số điện thoại'])CONFIG.school.phone=data.school['Số điện thoại'];
+    if(data.school['Email'])CONFIG.school.email=data.school['Email'];
+    if(data.school['Năm học'])CONFIG.school.year=data.school['Năm học'];
+  }
+  updateHero();
+  var f1=document.getElementById('featGV');if(f1)f1.textContent=T.length+' CBGVNV • Hồ sơ cá nhân';
+  var f2=document.getElementById('featHS');if(f2)f2.textContent=Object.keys(CL).reduce(function(a,k){return a+(CL[k]||[]).length},0)+' lớp • '+tA+' học sinh • 2 cấp';
+}
+
 function loadFromAPI(){
-  toast('⏳ Đang tải dữ liệu từ Google Sheets...','warning');
+  // Bước 1: Tải cache trước (hiển thị ngay lập tức)
+  var cached=cacheGet(CACHE_KEY);
+  var cachedTs=cacheGet(CACHE_TS_KEY);
+  if(cached){
+    applyData(cached,'cache');
+    updateSyncStatus('cached',cachedTs);
+    if(S.page!=='home')render(true);
+  }
+
+  // Bước 2: Tải từ Google Sheets (cập nhật mới nhất)
+  updateSyncStatus('syncing');
+  if(!cached)toast('⏳ Đang tải dữ liệu từ Google Sheets...','warning');
   apiGet('getAll',function(data){
-    if(data.error){toast('⚠️ Dùng dữ liệu mẫu (offline): '+data.error,'warning');return}
-    // Cập nhật giáo viên
-    if(data.teachers&&data.teachers.length>0){
-      T=data.teachers;
-      nTH=T.filter(function(x){return x.lv==='TH'}).length;
-      nCS=T.filter(function(x){return x.lv==='THCS'}).length;
+    if(data.error){
+      if(cached){
+        toast('📶 Offline — dùng bản lưu gần nhất','warning');
+        updateSyncStatus('offline',cachedTs);
+      } else {
+        toast('⚠️ Dùng dữ liệu mẫu (offline): '+data.error,'warning');
+        updateSyncStatus('offline');
+      }
+      return;
     }
-    // Cập nhật lớp học
-    if(data.classes&&data.classes.length>0){
-      CL={};G.forEach(function(g){CL[g.id]=[]});
-      data.classes.forEach(function(c){
-        var gId=parseInt(c.grade);
-        if(CL[gId]){CL[gId].push({n:c.code,t:c.teacher,s:parseInt(c.count)||0})}
-      });
-      // Cập nhật sĩ số trên G
-      G.forEach(function(g){
-        var cls=CL[g.id]||[];
-        g.c=cls.length;
-        g.s=cls.reduce(function(a,c){return a+c.s},0);
-      });
-      tA=G.reduce(function(a,g){return a+g.s},0);
-    }
-    // Cập nhật danh mục hồ sơ từ Sheets (nếu có)
-    if(data.danhMuc&&data.danhMuc.categories&&data.danhMuc.categories.length>0){
-      DC=data.danhMuc.categories;
-      if(data.danhMuc.links){Object.keys(data.danhMuc.links).forEach(function(k){var v=data.danhMuc.links[k];if(v&&(v.d||v.s)){if(!CONFIG.links[k])CONFIG.links[k]={d:'',s:''};if(v.d)CONFIG.links[k].d=v.d;if(v.s)CONFIG.links[k].s=v.s}})}
-    }
-    // Cập nhật links
-    // Merge links từ Sheets (chỉ ghi đè nếu Sheets có link thật, giữ link nhúng sẵn)
-    if(data.links){Object.keys(data.links).forEach(function(k){var v=data.links[k];if(v&&(v.d||v.s)){if(!CONFIG.links[k])CONFIG.links[k]={d:'',s:''};if(v.d)CONFIG.links[k].d=v.d;if(v.s)CONFIG.links[k].s=v.s}})}
-    // Cập nhật thông tin trường
-    if(data.school){
-      if(data.school['Tên trường'])CONFIG.school.name=data.school['Tên trường'];
-      if(data.school['Địa chỉ'])CONFIG.school.address=data.school['Địa chỉ'];
-      if(data.school['Hiệu trưởng'])CONFIG.school.principal=data.school['Hiệu trưởng'];
-      if(data.school['Số điện thoại'])CONFIG.school.phone=data.school['Số điện thoại'];
-      if(data.school['Email'])CONFIG.school.email=data.school['Email'];
-      if(data.school['Năm học'])CONFIG.school.year=data.school['Năm học'];
-    }
-    updateHero();
-    toast('✅ Đã tải dữ liệu từ Google Sheets!');
-    // Cập nhật feat desc
-    var f1=document.getElementById('featGV');if(f1)f1.textContent=T.length+' CBGVNV • Hồ sơ cá nhân';
-    var f2=document.getElementById('featHS');if(f2)f2.textContent=Object.keys(CL).reduce(function(a,k){return a+(CL[k]||[]).length},0)+' lớp • '+tA+' học sinh • 2 cấp';
+    // Áp dụng dữ liệu mới + lưu cache
+    applyData(data,'api');
+    saveToCache(data);
+    if(S.page!=='home')render(true);
+    toast('✅ Đã đồng bộ từ Google Sheets!');
   });
 }
 // Load on start
