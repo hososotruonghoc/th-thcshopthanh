@@ -545,7 +545,27 @@ function isGV(p){return !isLD(p)&&!isNV(p)}
 function toast(m,t){var e=document.getElementById('toast');e.className='toast '+(t||'success');e.innerHTML=m;setTimeout(function(){e.classList.add('show')},10);setTimeout(function(){e.classList.remove('show')},3000)}
 function openLogin(){document.getElementById('loginModal').classList.add('show');document.getElementById('loginPass').value='';document.getElementById('loginError').style.display='none';setTimeout(function(){document.getElementById('loginPass').focus()},200)}
 function closeLogin(){document.getElementById('loginModal').classList.remove('show')}
-function doLogin(){var p=document.getElementById('loginPass').value;if(p===CONFIG.adminPass){isAdmin=true;closeLogin();toast('🔓 Thành công!');document.getElementById('adminBar').style.display='flex';S.page="admin";S.atab="school";render()}else{document.getElementById('loginError').style.display='block'}}
+function doLogin(){
+  var p=document.getElementById('loginPass').value;
+  // Thử cả mật khẩu local và mật khẩu từ API
+  if(p===CONFIG.adminPass){
+    isAdmin=true;closeLogin();toast('🔓 Thành công!');
+    document.getElementById('adminBar').style.display='flex';
+    S.page="admin";S.atab="school";render();
+  } else {
+    // Thử xác thực qua API (phòng trường hợp mật khẩu đã thay đổi trên Sheets)
+    apiGet('debugAdmin',function(r){
+      if(r&&r.adminPass&&p===r.adminPass){
+        CONFIG.adminPass=p;
+        isAdmin=true;closeLogin();toast('🔓 Thành công!');
+        document.getElementById('adminBar').style.display='flex';
+        S.page="admin";S.atab="school";render();
+      } else {
+        document.getElementById('loginError').style.display='block';
+      }
+    });
+  }
+}
 function doLogout(){isAdmin=false;document.getElementById('adminBar').style.display='none';S.page="home";toast('🔒 Đã đăng xuất','warning');render()}
 function setN(k){document.querySelectorAll('.hdr-link').forEach(function(b){b.classList.remove('active')});var e=document.getElementById('nav-'+k);if(e)e.classList.add('active')}
 function showPage(p){document.getElementById('landing').style.display=p==='home'?'block':'none';document.getElementById('app').style.display=p==='home'?'none':'block'}
@@ -2022,6 +2042,8 @@ function applyData(data,source){
     if(data.school['Năm học'])CONFIG.school.year=data.school['Năm học'];
   }
   updateHero();
+  // Đồng bộ mật khẩu admin từ Sheets
+  if(data.adminPass){CONFIG.adminPass=String(data.adminPass).trim()}
   var f1=document.getElementById('featGV');if(f1)f1.textContent=T.length+' CBGVNV • Hồ sơ cá nhân';
   var f2=document.getElementById('featHS');if(f2)f2.textContent=Object.keys(CL).reduce(function(a,k){return a+(CL[k]||[]).length},0)+' lớp • '+tA+' học sinh • 2 cấp';
 }
