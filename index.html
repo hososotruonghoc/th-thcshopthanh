@@ -590,8 +590,8 @@ function scnSelectClass(cls){
   }
   scnState.pendingClass=cls;
   document.getElementById('scnPassModal').classList.add('show');
-  document.getElementById('scnPassModalTitle').textContent='🔑 Đăng nhập Sổ CN lớp '+cls;
-  document.getElementById('scnPassModalHint').textContent='Mật khẩu: '+cls.toLowerCase()+'gvcn';
+  document.getElementById('scnPassModalTitle').textContent='🔑 Sổ CN lớp '+cls;
+  document.getElementById('scnPassModalHint').textContent='Nhập mật khẩu do GVCN cung cấp';
   var inp=document.getElementById('scnPassInput');
   inp.value='';
   document.getElementById('scnPassErr').style.display='none';
@@ -600,32 +600,43 @@ function scnSelectClass(cls){
 function scnLogin(){
   var pass=document.getElementById('scnPassInput').value.trim();
   if(!pass){toast('⚠️ Nhập mật khẩu lớp!','warning');return}
-  // Client-side verification (hoạt động cả khi chưa deploy Apps Script mới)
-  var match=pass.match(/^(.+?)gvcn$/i);
-  if(!match){
+  var cls=scnState.pendingClass;
+  document.getElementById('scnPassErr').style.display='none';
+  toast('⏳ Đang xác thực...','warning');
+  
+  // Gọi API verifyCN → kiểm tra mật khẩu từ sheet MatKhauLop
+  apiGet('verifyCN&password='+encodeURIComponent(pass),function(r){
+    if(r&&r.success&&r.className){
+      // API xác thực thành công → kiểm tra lớp có đúng không
+      if(r.className!==cls.toUpperCase()){
+        document.getElementById('scnPassErr').style.display='block';
+        document.getElementById('scnPassErr').innerHTML='⚠️ Mật khẩu này thuộc lớp '+r.className+', không phải lớp '+cls+'!';
+        return;
+      }
+      scnState.loggedIn=true;scnState.className=r.className;scnState.password=pass;scnState.tab='overview';
+      scnState.ddData=null;scnState.nkData=null;scnState.llData=null;
+      document.getElementById('scnPassModal').classList.remove('show');
+      toast('✅ Đăng nhập lớp '+r.className+' thành công!');
+      render();
+      return;
+    }
+    // API trả lỗi → thử fallback client-side (pattern [ClassName]gvcn)
+    if(r&&r.error&&r.error.indexOf('không hợp lệ')>=0){
+      // API chưa deploy → dùng client-side
+      var match=pass.match(/^(.+?)gvcn$/i);
+      if(match&&match[1].toUpperCase()===cls.toUpperCase()){
+        scnState.loggedIn=true;scnState.className=cls.toUpperCase();scnState.password=pass;scnState.tab='overview';
+        scnState.ddData=null;scnState.nkData=null;scnState.llData=null;
+        document.getElementById('scnPassModal').classList.remove('show');
+        toast('✅ Đăng nhập lớp '+cls+' (offline)');
+        render();
+        return;
+      }
+    }
+    // Sai mật khẩu
     document.getElementById('scnPassErr').style.display='block';
-    document.getElementById('scnPassErr').innerHTML='⚠️ Mật khẩu không đúng! (Định dạng: Tên lớp + gvcn)';
-    return;
-  }
-  var clsFromPass=match[1].toUpperCase();
-  if(clsFromPass!==scnState.pendingClass.toUpperCase()){
-    document.getElementById('scnPassErr').style.display='block';
-    document.getElementById('scnPassErr').innerHTML='⚠️ Mật khẩu không khớp với lớp '+scnState.pendingClass+'!';
-    return;
-  }
-  // Kiểm tra lớp tồn tại trong dữ liệu local
-  var found=false;
-  Object.keys(CL).forEach(function(k){(CL[k]||[]).forEach(function(c){if(c.n.toUpperCase()===clsFromPass)found=true})});
-  if(!found){
-    document.getElementById('scnPassErr').style.display='block';
-    document.getElementById('scnPassErr').innerHTML='⚠️ Lớp "'+clsFromPass+'" không tồn tại!';
-    return;
-  }
-  scnState.loggedIn=true;scnState.className=clsFromPass;scnState.password=pass.toLowerCase();scnState.tab='overview';
-  scnState.ddData=null;scnState.nkData=null;scnState.llData=null;
-  document.getElementById('scnPassModal').classList.remove('show');
-  toast('✅ Đăng nhập lớp '+clsFromPass+' thành công!');
-  render();
+    document.getElementById('scnPassErr').innerHTML='⚠️ '+(r&&r.error?r.error:'Mật khẩu không đúng!');
+  });
 }
 function scnLogout(){scnState.loggedIn=false;scnState.className=null;scnState.password=null;toast('🔒 Đã đăng xuất sổ chủ nhiệm','warning');render()}
 function scnSetTab(t){scnState.tab=t;render(true)}
@@ -671,7 +682,7 @@ function rSCN(a){
     }).join('')}).join('')+'</div></div>'+
 
     '</div>'+
-    '<div style="text-align:center;margin-top:16px;padding:14px;background:#ede9fe;border-radius:12px;font-size:13px;color:#5b21b6">🔑 Chọn lớp → Nhập mật khẩu (Tên lớp + "gvcn", VD: <strong>1Agvcn</strong>) → Vào Sổ chủ nhiệm</div>';
+    '<div style="text-align:center;margin-top:16px;padding:14px;background:#ede9fe;border-radius:12px;font-size:13px;color:#5b21b6">🔑 Chọn lớp → Nhập mật khẩu (mặc định: Tên lớp + "gvcn", VD: <strong>1agvcn</strong>) → Vào Sổ chủ nhiệm<br><span style="font-size:11px;color:#7c3aed">GV có thể đổi mật khẩu sau khi đăng nhập</span></div>';
     return;
   }
   // Logged in — render SCN dashboard
